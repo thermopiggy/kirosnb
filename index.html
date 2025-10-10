@@ -176,6 +176,20 @@
   background:rgba(46,125,50,.15); color:var(--chiro-text); cursor:pointer; transition:.15s;
 }
 .note-btn:hover{background:rgba(46,125,50,.25)}
+/* Навигация в календара */
+.cal-nav{
+  width:36px; height:36px; border-radius:10px; border:1px solid var(--chiro-border);
+  background:rgba(255,255,255,.04); color:var(--chiro-text); cursor:pointer;
+}
+.cal-nav:hover{background:rgba(255,255,255,.08)}
+.chiro-cal-title{display:flex; gap:8px; align-items:center; font-weight:700}
+#calMonth,#calYear{
+  background:rgba(255,255,255,.04); color:var(--chiro-text);
+  border:1px solid var(--chiro-border); border-radius:10px; padding:.4rem .6rem;
+}
+#calMonth:hover,#calYear:hover{background:rgba(255,255,255,.08)}
+/* Минали дни — заключени */
+.chiro-cal-day.disabled{opacity:.35; filter:saturate(.6); pointer-events:none}
 
   </style>
 </head>
@@ -317,10 +331,19 @@
 <section id="calendar" class="section">
   <h2>Календар</h2>
   <div class="card">
-    <div class="chiro-cal-head">
-      <div class="chiro-cal-title" id="calTitle">Месец ГГГГ</div>
-      <!-- навигацията ще дойде в Стъпка 2 -->
-    </div>
+  <div class="chiro-cal-head">
+  <button id="calPrev" class="cal-nav" aria-label="Предишен месец">‹</button>
+  <div class="chiro-cal-title">
+    <select id="calMonth" aria-label="Месец">
+      <option value="0">Януари</option><option value="1">Февруари</option><option value="2">Март</option>
+      <option value="3">Април</option><option value="4">Май</option><option value="5">Юни</option>
+      <option value="6">Юли</option><option value="7">Август</option><option value="8">Септември</option>
+      <option value="9">Октомври</option><option value="10">Ноември</option><option value="11">Декември</option>
+    </select>
+    <select id="calYear" aria-label="Година"></select>
+  </div>
+  <button id="calNext" class="cal-nav" aria-label="Следващ месец">›</button>
+</div>
 
     <div class="chiro-cal-grid" id="calGrid">
       <!-- дни от седмицата -->
@@ -422,24 +445,50 @@
     })();
   </script>
   <script>
-/* === CHIRO CALENDAR v1: визуал + 3 слота/ден (локално) === */
+<script>
+/* === CHIRO CALENDAR v2: навигация 2025–2050, локално съхранение, заключени минали дни === */
 (() => {
-  const startYear = 2025;   // в Стъпка 2 ще добавим навигация до 2050
+  const minYear = 2025;
+  const maxYear = 2050;
   const monthsBg = ["Януари","Февруари","Март","Април","Май","Юни","Юли","Август","Септември","Октомври","Ноември","Декември"];
 
-  // За СТЪПКА 1: показваме текущия месец (ако е преди 2025, фиксираме януари 2025)
-  const now = new Date();
-  let viewYear  = Math.max(now.getFullYear(), startYear);
-  let viewMonth = (viewYear === startYear && now.getFullYear() < startYear) ? 0 : now.getMonth();
+  // Днес (00:00)
+  const today = new Date(); today.setHours(0,0,0,0);
 
-  const calTitle = document.getElementById('calTitle');
+  // Начален изглед
+  const now = new Date();
+  let viewYear  = Math.min(Math.max(now.getFullYear(), minYear), maxYear);
+  let viewMonth = now.getMonth();
+
+  // DOM
   const calGrid  = document.getElementById('calGrid');
   const pop      = document.getElementById('calPop');
   const popClose = document.getElementById('popClose');
   const popDateLabel = document.getElementById('popDateLabel');
+  const monthSel = document.getElementById('calMonth');
+  const yearSel  = document.getElementById('calYear');
+  const btnPrev  = document.getElementById('calPrev');
+  const btnNext  = document.getElementById('calNext');
 
-  // Локално състояние: { 'YYYY-MM-DD': { '09:00-11:00':true/false, ... } }
-  const daySlots = new Map();
+  // Локално състояние на слотовете + персист в localStorage
+  const LS_SLOTS_KEY = 'CHIRO_SLOTS_V1';
+  let daySlots = new Map();
+
+  function loadSlots(){
+    try{
+      const raw = localStorage.getItem(LS_SLOTS_KEY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      // obj: { 'YYYY-MM-DD': {slot:true/false,...}, ... }
+      daySlots = new Map(Object.entries(obj));
+    }catch{}
+  }
+  function saveSlots(){
+    try{
+      const obj = Object.fromEntries(daySlots);
+      localStorage.setItem(LS_SLOTS_KEY, JSON.stringify(obj));
+    }catch{}
+  }
 
   function ymd(d){
     const y = d.getFullYear();
@@ -449,33 +498,27 @@
   }
 
   function getMonthMatrix(year, monthIndex){
-    // начало на месеца
     const first = new Date(year, monthIndex, 1);
     const startDay = (first.getDay() + 6) % 7; // понеделник=0
     const daysInMonth = new Date(year, monthIndex+1, 0).getDate();
 
-    // предходни дни за да запълнят първия ред
     const prevDays = startDay;
     const prevMonthDays = new Date(year, monthIndex, 0).getDate();
 
     const cells = [];
-    // предходни
     for(let i=prevDays; i>0; i--){
       const d = new Date(year, monthIndex-1, prevMonthDays - i + 1);
       cells.push({date:d, out:true});
     }
-    // текущи
     for(let i=1; i<=daysInMonth; i++){
       const d = new Date(year, monthIndex, i);
       cells.push({date:d, out:false});
     }
-    // следващи за запълване на 6 реда (42 клетки)
     while(cells.length % 7 !== 0) {
       const last = cells[cells.length-1].date;
       const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
       cells.push({date:d, out:true});
     }
-    // гарантираме 6 реда (42 клетки), Airbnb стил
     while(cells.length < 42){
       const last = cells[cells.length-1].date;
       const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
@@ -504,19 +547,47 @@
     return 'partial';
   }
 
+  function fillYearOptions(){
+    yearSel.innerHTML = '';
+    for(let y=minYear; y<=maxYear; y++){
+      const opt = document.createElement('option');
+      opt.value = String(y);
+      opt.textContent = y;
+      yearSel.appendChild(opt);
+    }
+  }
+
+  function clampYearMonth(y, m){
+    // нормализиране на месеците при прелистване
+    let year = y, month = m;
+    while(month < 0){ month += 12; year--; }
+    while(month > 11){ month -= 12; year++; }
+    if(year < minYear){ year = minYear; month = 0; }
+    if(year > maxYear){ year = maxYear; month = 11; }
+    return [year, month];
+  }
+
   function renderMonth(year, monthIndex){
-    calTitle.textContent = `${monthsBg[monthIndex]} ${year}`;
-    // махаме старите дни (но оставяме заглавията на дните – първите 7 div-а)
-    const nodes = Array.from(calGrid.querySelectorAll('.chiro-cal-day'));
-    nodes.forEach(n => n.remove());
+    // синхронизирай селекторите
+    monthSel.value = String(monthIndex);
+    yearSel.value  = String(year);
+
+    // почисти старите дни
+    calGrid.querySelectorAll('.chiro-cal-day').forEach(n => n.remove());
 
     const cells = getMonthMatrix(year, monthIndex);
     cells.forEach(cell => {
-      const d = cell.date;
+      const d = new Date(cell.date);
+      d.setHours(0,0,0,0);
       const dayKey = ymd(d);
+
       const day = document.createElement('div');
       day.className = 'chiro-cal-day' + (cell.out ? ' out' : '');
       day.dataset.date = dayKey;
+
+      // заключи минали дни (Airbnb стил)
+      const isPast = d < today;
+      if(isPast) day.classList.add('disabled');
 
       const num = document.createElement('div');
       num.className = 'num';
@@ -524,7 +595,6 @@
 
       const dots = document.createElement('div');
       dots.className = 'dots';
-      // една точка, която показва заетостта на деня (free/partial/full)
       const dot = document.createElement('div');
       dot.className = 'dot ' + dayOccupancy(dayKey);
       dots.appendChild(dot);
@@ -532,11 +602,9 @@
       day.appendChild(num);
       day.appendChild(dots);
 
-      // само дни от текущия месец са кликаеми (Airbnb UX)
-      if(!cell.out){
-        day.addEventListener('click', (e) => openPopFor(day, dayKey));
-      } else {
-        day.style.pointerEvents = 'none';
+      // клик само по дни от текущия месец и не минали
+      if(!cell.out && !isPast){
+        day.addEventListener('click', () => openPopFor(day, dayKey));
       }
 
       calGrid.appendChild(day);
@@ -547,21 +615,18 @@
   function openPopFor(dayEl, dayKey){
     anchorDayEl = dayEl;
 
-    // позициониране близо до долния десен ъгъл: (СТЪПКА 1 – опростено, фиксирано долу вдясно)
     pop.classList.add('show');
     pop.setAttribute('aria-hidden','false');
     pop.dataset.date = dayKey;
 
-    // Етикет дата
     const [y,m,d] = dayKey.split('-');
     popDateLabel.textContent = `${d}.${m}.${y}`;
 
-    // зареждане на състоянието
     const st = slotStateFor(dayKey);
     document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
       const slot = btn.dataset.slot;
       btn.classList.toggle('selected', !!st[slot]);
-      btn.classList.remove('busy'); // за СТЪПКА 1 нямаме реални „busy“
+      btn.classList.remove('busy');
     });
   }
 
@@ -571,20 +636,24 @@
     anchorDayEl = null;
   }
 
-  // Клик по слотовете
+  // Клик по слотовете: toggle + запазване + актуализация на точката
   document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const dayKey = pop.dataset.date;
       const st = slotStateFor(dayKey);
       const slot = btn.dataset.slot;
-      st[slot] = !st[slot];       // toggle
+
+      st[slot] = !st[slot];
       btn.classList.toggle('selected', !!st[slot]);
 
-      // обновяваме „точката“ (free/partial/full)
+      // обнови точката
       if(anchorDayEl){
         const dot = anchorDayEl.querySelector('.dot');
         dot.className = 'dot ' + dayOccupancy(dayKey);
       }
+      // persist
+      daySlots.set(dayKey, st);
+      saveSlots();
     });
   });
 
@@ -598,10 +667,36 @@
     }
   });
 
-  // Рендер
+  // Навигация
+  btnPrev.addEventListener('click', () => {
+    [viewYear, viewMonth] = clampYearMonth(viewYear, viewMonth - 1);
+    renderMonth(viewYear, viewMonth);
+  });
+  btnNext.addEventListener('click', () => {
+    [viewYear, viewMonth] = clampYearMonth(viewYear, viewMonth + 1);
+    renderMonth(viewYear, viewMonth);
+  });
+  monthSel.addEventListener('change', () => {
+    viewMonth = parseInt(monthSel.value, 10);
+    renderMonth(viewYear, viewMonth);
+  });
+  yearSel.addEventListener('change', () => {
+    viewYear = Math.min(Math.max(parseInt(yearSel.value,10), minYear), maxYear);
+    renderMonth(viewYear, viewMonth);
+  });
+
+  // Инициализация
+  fillYearOptions();
+  loadSlots();
+
+  // Ако текущата дата е извън 2025–2050, показваме Януари 2025
+  if(now.getFullYear() < minYear){ viewYear=minYear; viewMonth=0; }
+  if(now.getFullYear() > maxYear){ viewYear=maxYear; viewMonth=11; }
+
   renderMonth(viewYear, viewMonth);
 })();
 </script>
+
 <script>
 /* === Бележка за зает слот (само за админ) === */
 (() => {
