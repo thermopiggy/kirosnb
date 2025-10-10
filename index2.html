@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chiro – Snowboard Lessons</title>
+  <meta name="description" content="Chiro Snowboard Lessons – История, Уроци, Цени, Календар." />
+  <style>
+    :root{
+      --chiro-bg: rgba(15,17,20,.55);
+      --chiro-blur: blur(8px);
+      --chiro-border: rgba(255,255,255,.1);
+      --chiro-text: #f2f5f7;
+      --chiro-brand: #ffffff;
+      --chiro-wa: #25D366;
+      --chiro-viber: #7360F2;
+      --chiro-phone: #1E88E5;
+      --card-bg: rgba(255,255,255,.04);
+    }
+    html,body{height:100%;margin:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
+      color:#e9eef2;background:#0b0e12;scroll-padding-top:70px
+    }
+    a{color:inherit;text-decoration:none}
+
+    /* NAVBAR */
+    .chiro-navbar{
+      position:fixed; inset:0 0 auto 0; height:60px;
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+      gap:.5rem; padding:0 .5rem; z-index:1000;
+      color:var(--chiro-text);
+      background:var(--chiro-bg); backdrop-filter:var(--chiro-blur);
+      border-bottom:1px solid var(--chiro-border);
+    }
+    .chiro-left{display:flex; align-items:center; gap:.25rem}
+    .chiro-right{justify-self:end; display:flex; align-items:center; gap:.25rem}
+    .chiro-iconbtn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:40px; height:40px; border-radius:10px;
+      background:transparent; color:var(--chiro-text);
+      border:1px solid transparent; cursor:pointer; transition:.25s;
+    }
+    .chiro-iconbtn:hover{background:rgba(255,255,255,.08);border-color:var(--chiro-border)}
+    .chiro-logo{justify-self:center;font-weight:800;letter-spacing:.5px;color:var(--chiro-brand);font-size:1.2rem}
+
+    /* DRAWERS */
+    .chiro-drawer{
+      position:fixed; inset:0 auto 0 0; width:min(86vw,320px);
+      transform:translateX(-102%); transition:transform .32s ease;
+      background:rgba(10,12,14,.75); backdrop-filter:var(--chiro-blur);
+      color:var(--chiro-text); z-index:1100;
+      border-right:1px solid var(--chiro-border);
+      display:flex; flex-direction:column; padding-bottom:1rem;
+    }
+    .chiro-drawer.open{transform:none}
+    .chiro-drawer-header{display:flex; align-items:center; gap:.5rem; padding:.75rem}
+    .chiro-drawer-item{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.9rem 1rem; color:var(--chiro-text);
+      border-top:1px solid var(--chiro-border); transition:background .2s;
+      background:transparent; cursor:pointer; font:inherit;
+    }
+    .chiro-drawer-item:hover{background:rgba(255,255,255,.06)}
+    .chiro-subdrawer{ left:0; z-index:1150; }
+    .chiro-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
+      opacity:0; pointer-events:none; transition:opacity .25s; z-index:1090;
+    }
+    .chiro-overlay.show{opacity:1; pointer-events:auto}
+
+    /* FLOATING CONTACT BUTTONS */
+    .chiro-fabwrap{
+      position:fixed; right:16px; bottom:16px; z-index:1000;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .chiro-fab{
+      width:52px; height:52px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(25,28,32,.55); backdrop-filter:var(--chiro-blur);
+      color:#e8eef3; border:1px solid var(--chiro-border);
+      box-shadow:0 4px 14px rgba(0,0,0,.25);
+      transition:transform .15s, background-color .2s, color .2s, opacity .2s;
+      opacity:.92;
+    }
+    .chiro-fab:hover{transform:translateY(-2px); opacity:1}
+    .chiro-wa:hover{background:var(--chiro-wa); color:#fff}
+    .chiro-viber:hover{background:var(--chiro-viber); color:#fff}
+    .chiro-phone:hover{background:var(--chiro-phone); color:#fff}
+
+    /* LAYOUT */
+    .section{padding:72px 16px; max-width:1100px; margin:0 auto}
+    .section h2{margin:0 0 12px; font-size:clamp(22px,4.5vw,34px)}
+    .card{background:var(--card-bg); border:1px solid var(--chiro-border); border-radius:16px; padding:16px}
+    .grid{display:grid; gap:14px}
+    .grid.cols-2{grid-template-columns:1fr}
+    @media (min-width:800px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
+
+    /* HERO */
+    .hero{
+      min-height:100vh; display:grid; place-items:center; padding-top:60px;
+      background:radial-gradient(1200px 600px at 70% 10%,rgba(255,255,255,.06),transparent 60%),
+                 linear-gradient(#0b0e12,#0b0e12);
+      text-align:center;
+    }
+    .hero h1{margin:0 1rem; font-size:clamp(28px,6vw,60px); line-height:1.05}
+    .hero p{opacity:.8; margin:.5rem 1rem 0}
+
+    /* CALENDAR CORE */
+    .chiro-cal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+    .cal-nav{
+      width:36px; height:36px; border-radius:10px; border:1px solid var(--chiro-border);
+      background:rgba(255,255,255,.04); color:var(--chiro-text); cursor:pointer;
+    }
+    .cal-nav:hover{background:rgba(255,255,255,.08)}
+    .chiro-cal-title{display:flex; gap:8px; align-items:center; font-weight:700}
+    #calMonth,#calYear{
+      background:rgba(255,255,255,.04); color:var(--chiro-text);
+      border:1px solid var(--chiro-border); border-radius:10px; padding:.4rem .6rem;
+    }
+    #calMonth:hover,#calYear:hover{background:rgba(255,255,255,.08)}
+
+    .chiro-cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; user-select:none}
+    .chiro-cal-dow{text-align:center; opacity:.75; font-size:.9rem; padding:.4rem 0; border-bottom:1px dashed var(--chiro-border)}
+    .chiro-cal-day{
+      position:relative; min-height:74px; border:1px solid var(--chiro-border);
+      border-radius:12px; padding:8px; background:rgba(255,255,255,.03);
+      display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:.15s;
+    }
+    .chiro-cal-day:hover{background:rgba(255,255,255,.06)}
+    .chiro-cal-day.out{opacity:.45; filter:saturate(.7)}
+    .chiro-cal-day.disabled{opacity:.35; filter:saturate(.6); pointer-events:none}
+    .chiro-cal-day .num{font-weight:700; font-size:.95rem}
+    .chiro-cal-day .dots{margin-top:auto; display:flex; gap:6px}
+    .dot{width:8px; height:8px; border-radius:50%; opacity:.7; border:1px solid var(--chiro-border)}
+    .dot.free{background:#2e7d32}
+    .dot.partial{background:#f9a825}
+    .dot.full{background:#c62828}
+
+    /* POPUP */
+    .chiro-cal-pop{
+      position:fixed; inset:auto 16px 16px auto; z-index:1200;
+      width:min(94vw,360px); border:1px solid var(--chiro-border);
+      border-radius:14px; background:rgba(10,12,14,.9); backdrop-filter:blur(8px);
+      padding:12px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+      transform:translateY(10px); opacity:0; pointer-events:none; transition:.18s;
+    }
+    .chiro-cal-pop.show{transform:none; opacity:1; pointer-events:auto}
+    .chiro-cal-pop-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+    .chiro-cal-pop-x{
+      background:transparent; border:1px solid var(--chiro-border); color:var(--chiro-text);
+      width:28px; height:28px; border-radius:8px; cursor:pointer;
+    }
+    .chiro-cal-note-wrap{
+      display:flex; flex-direction:column; gap:8px; margin-bottom:10px; padding:10px;
+      border:1px solid var(--chiro-border); border-radius:10px; background:rgba(255,255,255,.03);
+    }
+    .chiro-cal-note-label{font-size:.9rem; opacity:.9}
+    #slotNote{
+      width:100%; resize:vertical; min-height:72px;
+      border:1px solid var(--chiro-border); border-radius:10px;
+      background:rgba(10,12,14,.7); color:var(--chiro-text);
+      padding:.6rem .7rem; outline:none;
+    }
+    #slotNote:focus{box-shadow:0 0 0 2px rgba(46,125,50,.35)}
+    .note-actions{display:flex; gap:8px; justify-content:flex-end}
+    .note-btn{
+      padding:.55rem .9rem; border-radius:10px; border:1px solid var(--chiro-border);
+      background:rgba(46,125,50,.15); color:var(--chiro-text); cursor:pointer; transition:.15s;
+    }
+    .note-btn:hover{background:rgba(46,125,50,.25)}
+    .chiro-cal-slots{display:flex; flex-direction:column; gap:8px}
+    .slot-btn{
+      width:100%; padding:.65rem .8rem; border-radius:10px; border:1px solid var(--chiro-border);
+      background:rgba(255,255,255,.04); color:var(--chiro-text); cursor:pointer; text-align:left; transition:.15s;
+    }
+    .slot-btn:hover{background:rgba(255,255,255,.08)}
+    .slot-btn.selected{outline:2px solid #2e7d32; background:rgba(46,125,50,.15)}
+    .slot-btn.busy{opacity:.5; text-decoration:line-through}
+    .chiro-cal-note{opacity:.7; font-size:.85rem; margin-top:6px}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="chiro-navbar">
+    <div class="chiro-left">
+      <button id="chiroHamburger" class="chiro-iconbtn" aria-label="Меню" aria-expanded="false">
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="chiro-iconbtn" aria-label="Локация">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 22s7-5.4 7-12a7 7 0 1 0-14 0c0 6.6 7 12 7 12zM12 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="chiro-iconbtn" aria-label="Live камери">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 3v-9l-4 3z" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="chiro-iconbtn" aria-label="Време">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.5 13a5.5 5.5 0 1 1 5.5 5.5A5.5 5.5 0 0 1 6.5 13zm5.5-9V1m0 22v-3m7.8-12.3l2.1-2.1M2.6 21.4l2.1-2.1m0-12.3L2.6 4.9M21.4 21.4l-2.1-2.1M1 13h3m16 0h3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <a href="#" class="chiro-logo" aria-label="Chiro – Snowboard Lessons">Chiro</a>
+    <div class="chiro-right"></div>
+  </nav>
+
+  <!-- MAIN DRAWER -->
+  <aside id="chiroDrawer" class="chiro-drawer" aria-hidden="true">
+    <div class="chiro-drawer-header">
+      <button id="chiroDrawerClose" class="chiro-iconbtn" aria-label="Затвори меню">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <strong>Меню</strong>
+    </div>
+    <a href="#history" class="chiro-drawer-item">История</a>
+    <button id="chiroLessonsBtn" class="chiro-drawer-item" aria-haspopup="true" aria-expanded="false">
+      Уроци <span aria-hidden="true">▸</span>
+    </button>
+    <a href="#prices" class="chiro-drawer-item">Цени</a>
+    <a href="#calendar" class="chiro-drawer-item">Календар</a>
+  </aside>
+
+  <!-- SUB-DRAWER: УРОЦИ -->
+  <aside id="chiroLessonsDrawer" class="chiro-drawer chiro-subdrawer" aria-hidden="true">
+    <div class="chiro-drawer-header">
+      <button id="chiroLessonsBack" class="chiro-iconbtn" aria-label="Назад">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <strong>Уроци</strong>
+    </div>
+    <a href="#lvl0" class="chiro-drawer-item">Без опит</a>
+    <a href="#lvl1" class="chiro-drawer-item">С малко опит</a>
+    <a href="#lvl2" class="chiro-drawer-item">С много опит</a>
+  </aside>
+
+  <!-- OVERLAY -->
+  <div class="chiro-overlay" aria-hidden="true"></div>
+
+  <!-- FLOATING CONTACT BUTTONS -->
+  <div class="chiro-fabwrap" aria-label="Контакти">
+    <a class="chiro-fab chiro-wa" href="https://wa.me/XXXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M19.1 17.3c-.3-.2-1.8-.9-2-.9s-.5-.1-.7.3-.8.9-.9 1.1-.3.2-.6.1-1.1-.4-2.1-1.3c-.8-.7-1.3-1.6-1.5-1.8s0-.4.2-.6c.2-.2.4-.5.5-.7.2-.2.2-.4.3-.6 0-.2 0-.4 0-.6s-.7-1.8-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9 1.2 3.3 1.4 3.6 2.4 3.6 5.8 5 3.5.9 4.1 1 .9.1 1.3.1 1.3-.5 1.5-1.1.2-1 .2-1.1-.2-.3-.5-.5zM16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.4 1.7 6.3L3 29l6.9-1.8c1.8 1 3.9 1.6 6.1 1.6 7.2 0 13-5.8 13-13S23.2 3 16 3z" fill="currentColor"/></svg>
+    </a>
+    <a class="chiro-fab chiro-viber" href="viber://chat?number=%2BXXXXXXXXXX" aria-label="Viber">
+      <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M22.7 3H9.3C6.4 3 4 5.4 4 8.3v15.4C4 26.6 6.4 29 9.3 29h7.5l3.4 3 .1-3h2.4c2.9 0 5.3-2.4 5.3-5.3V8.3C28 5.4 25.6 3 22.7 3zm-1.2 15.5c-.2.5-1 .9-1.4 1-.4.1-.9.1-1.5-.1-.3-.1-.7-.2-1.2-.4-2.1-.9-3.5-2.9-3.6-3-.1-.1-.9-1.2-.9-2.3s.6-1.7.8-2 .4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.6 1.7.6 1.8.1.2.1.4 0 .6-.1.2-.2.4-.3.5-.1.1-.2.3-.1.5.1.2.5.8 1.1 1.4.7.7 1.4.9 1.6 1 .2.1.4.1.6 0 .2-.1 1-.5 1.1-.6s.3-.1.5 0 .9.4 1.1.5c.2.1.4.2.5.3.1.1.1.7-.1 1.2z" fill="currentColor"/></svg>
+    </a>
+    <a class="chiro-fab chiro-phone" href="tel:+359XXXXXXXX" aria-label="Обаждане">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2c-3.6-.3-7.1-2-9.8-4.7S3.6 10.8 3.3 7.2A2 2 0 0 1 5.3 5h3a1 1 0 0 1 1 .8l.7 3.2a1 1 0 0 1-.3 1l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a1 1 0 0 1 1-.3l3.2.7a1 1 0 0 1 .8 1z" fill="currentColor"/></svg>
+    </a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div>
+      <h1>Chiro Snowboard Lessons</h1>
+      <p>Професионални уроци – от първи стъпки до фрийрайд. Менюто е горе вляво.</p>
+    </div>
+  </section>
+
+  <!-- ИСТОРИЯ -->
+  <section id="history" class="section">
+    <h2>История</h2>
+    <div class="grid cols-2">
+      <div class="card"><p>Кратък текст за Чиро – опит, сертификати, стил на преподаване, локации.</p></div>
+      <div class="card"><p>Акценти: безопасност, индивидуален подход, прогрес още от първия ден.</p></div>
+    </div>
+  </section>
+
+  <!-- УРОЦИ -->
+  <section id="lessons" class="section">
+    <h2>Уроци</h2>
+    <div class="grid">
+      <div id="lvl0" class="card"><h3>Без опит</h3><p>Първи стъпки, баланс, плъзгане, спиране, лифт етикет.</p></div>
+      <div id="lvl1" class="card"><h3>С малко опит</h3><p>Свързани завои, контрол на скоростта, разнообразни терени.</p></div>
+      <div id="lvl2" class="card"><h3>С много опит</h3><p>Карвинг, дълбок сняг, фрийрайд линии и безопасност.</p></div>
+    </div>
+  </section>
+
+  <!-- ЦЕНИ -->
+  <section id="prices" class="section">
+    <h2>Цени</h2>
+    <div class="grid cols-2">
+      <div class="card"><h3>Индивидуален урок</h3><p>2 часа / 3 часа / цял ден. Цена: плейсхолдър.</p></div>
+      <div class="card"><h3>Групов урок</h3><p>До 4 души. Пакети за няколко дни. Цена: плейсхолдър.</p></div>
+    </div>
+  </section>
+
+  <!-- КАЛЕНДАР -->
+  <section id="calendar" class="section">
+    <h2>Календар</h2>
+    <div class="card">
+      <div class="chiro-cal-head">
+        <button id="calPrev" class="cal-nav" aria-label="Предишен месец">‹</button>
+        <div class="chiro-cal-title">
+          <select id="calMonth" aria-label="Месец">
+            <option value="0">Януари</option><option value="1">Февруари</option><option value="2">Март</option>
+            <option value="3">Април</option><option value="4">Май</option><option value="5">Юни</option>
+            <option value="6">Юли</option><option value="7">Август</option><option value="8">Септември</option>
+            <option value="9">Октомври</option><option value="10">Ноември</option><option value="11">Декември</option>
+          </select>
+          <select id="calYear" aria-label="Година"></select>
+        </div>
+        <button id="calNext" class="cal-nav" aria-label="Следващ месец">›</button>
+      </div>
+
+      <div class="chiro-cal-grid" id="calGrid">
+        <div class="chiro-cal-dow">Пн</div>
+        <div class="chiro-cal-dow">Вт</div>
+        <div class="chiro-cal-dow">Ср</div>
+        <div class="chiro-cal-dow">Чт</div>
+        <div class="chiro-cal-dow">Пт</div>
+        <div class="chiro-cal-dow">Сб</div>
+        <div class="chiro-cal-dow">Нд</div>
+      </div>
+
+      <div class="chiro-cal-pop" id="calPop" aria-hidden="true">
+        <div class="chiro-cal-pop-head">
+          <strong id="popDateLabel">Дата</strong>
+          <button class="chiro-cal-pop-x" id="popClose" aria-label="Затвори">✕</button>
+        </div>
+
+        <!-- Бележка за зает слот (само за админ) -->
+        <div class="chiro-cal-note-wrap" id="noteWrap" hidden>
+          <label for="slotNote" class="chiro-cal-note-label">Бележка за <span id="noteSlotLabel">слот</span>:</label>
+          <textarea id="slotNote" rows="3" placeholder="Добави бележка (напр. име, ниво, телефон)…"></textarea>
+          <div class="note-actions">
+            <button id="saveNoteBtn" class="note-btn">Запази бележката</button>
+          </div>
+        </div>
+
+        <div class="chiro-cal-slots">
+          <button class="slot-btn" data-slot="09:00-11:00">09:00–11:00</button>
+          <button class="slot-btn" data-slot="11:00-13:00">11:00–13:00</button>
+          <button class="slot-btn" data-slot="13:00-15:00">13:00–15:00</button>
+        </div>
+        <div class="chiro-cal-note">Демо функционалност без бекенд; данните се пазят локално.</div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* NAV + DRAWERS */
+    (() => {
+      const drawer = document.getElementById('chiroDrawer');
+      const sub = document.getElementById('chiroLessonsDrawer');
+      const burger = document.getElementById('chiroHamburger');
+      const closeMain = document.getElementById('chiroDrawerClose');
+      const lessonsBtn = document.getElementById('chiroLessonsBtn');
+      const lessonsBack = document.getElementById('chiroLessonsBack');
+      const overlay = document.querySelector('.chiro-overlay');
+
+      const openMain = () => { drawer.classList.add('open'); overlay.classList.add('show'); burger.setAttribute('aria-expanded','true'); drawer.setAttribute('aria-hidden','false'); };
+      const closeMainFn = () => { drawer.classList.remove('open'); overlay.classList.remove('show'); burger.setAttribute('aria-expanded','false'); drawer.setAttribute('aria-hidden','true'); closeSub(); };
+      const openSub = () => { sub.classList.add('open'); sub.setAttribute('aria-hidden','false'); lessonsBtn.setAttribute('aria-expanded','true'); };
+      const closeSub = () => { sub.classList.remove('open'); sub.setAttribute('aria-hidden','true'); lessonsBtn.setAttribute('aria-expanded','false'); };
+
+      burger.addEventListener('click', openMain);
+      closeMain.addEventListener('click', closeMainFn);
+      overlay.addEventListener('click', closeMainFn);
+      lessonsBtn.addEventListener('click', () => { if(!drawer.classList.contains('open')) openMain(); openSub(); });
+      lessonsBack?.addEventListener('click', () => closeSub());
+      document.querySelectorAll('.chiro-drawer a').forEach(a=>a.addEventListener('click', closeMainFn));
+      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(sub.classList.contains('open')){closeSub();return;} if(drawer.classList.contains('open')) closeMainFn(); }});
+    })();
+  </script>
+
+  <script>
+  /* CALENDAR v2: навигация 2025–2050, localStorage, заключени минали дни */
+  (() => {
+    const minYear = 2025, maxYear = 2050;
+    const monthsBg = ["Януари","Февруари","Март","Април","Май","Юни","Юли","Август","Септември","Октомври","Ноември","Декември"];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const now = new Date();
+
+    let viewYear  = Math.min(Math.max(now.getFullYear(), minYear), maxYear);
+    let viewMonth = now.getMonth();
+
+    const calGrid  = document.getElementById('calGrid');
+    const pop      = document.getElementById('calPop');
+    const popClose = document.getElementById('popClose');
+    const popDateLabel = document.getElementById('popDateLabel');
+    const monthSel = document.getElementById('calMonth');
+    const yearSel  = document.getElementById('calYear');
+    const btnPrev  = document.getElementById('calPrev');
+    const btnNext  = document.getElementById('calNext');
+
+    const LS_SLOTS_KEY = 'CHIRO_SLOTS_V1';
+    let daySlots = new Map();
+
+    function loadSlots(){
+      try{
+        const raw = localStorage.getItem(LS_SLOTS_KEY);
+        if(!raw) return;
+        const obj = JSON.parse(raw);
+        daySlots = new Map(Object.entries(obj));
+      }catch{}
+    }
+    function saveSlots(){
+      try{
+        const obj = Object.fromEntries(daySlots);
+        localStorage.setItem(LS_SLOTS_KEY, JSON.stringify(obj));
+      }catch{}
+    }
+
+    const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+    function getMonthMatrix(year, monthIndex){
+      const first = new Date(year, monthIndex, 1);
+      const startDay = (first.getDay() + 6) % 7; // понеделник=0
+      const daysInMonth = new Date(year, monthIndex+1, 0).getDate();
+
+      const prevDays = startDay;
+      const prevMonthDays = new Date(year, monthIndex, 0).getDate();
+
+      const cells = [];
+      for(let i=prevDays; i>0; i--){
+        const d = new Date(year, monthIndex-1, prevMonthDays - i + 1);
+        cells.push({date:d, out:true});
+      }
+      for(let i=1; i<=daysInMonth; i++){
+        const d = new Date(year, monthIndex, i);
+        cells.push({date:d, out:false});
+      }
+      while(cells.length % 7 !== 0) {
+        const last = cells[cells.length-1].date;
+        const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
+        cells.push({date:d, out:true});
+      }
+      while(cells.length < 42){
+        const last = cells[cells.length-1].date;
+        const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
+        cells.push({date:d, out:true});
+      }
+      return cells;
+    }
+
+    function slotStateFor(dayKey){
+      if(!daySlots.has(dayKey)){
+        daySlots.set(dayKey, {"09:00-11:00": false,"11:00-13:00": false,"13:00-15:00": false});
+      }
+      return daySlots.get(dayKey);
+    }
+
+    function dayOccupancy(dayKey){
+      const st = slotStateFor(dayKey);
+      const vals = Object.values(st);
+      const taken = vals.filter(Boolean).length;
+      if(taken === 0) return 'free';
+      if(taken === vals.length) return 'full';
+      return 'partial';
+    }
+
+    function fillYearOptions(){
+      yearSel.innerHTML = '';
+      for(let y=minYear; y<=maxYear; y++){
+        const opt = document.createElement('option');
+        opt.value = String(y); opt.textContent = y;
+        yearSel.appendChild(opt);
+      }
+    }
+
+    function clampYearMonth(y, m){
+      let year = y, month = m;
+      while(month < 0){ month += 12; year--; }
+      while(month > 11){ month -= 12; year++; }
+      if(year < minYear){ year = minYear; month = 0; }
+      if(year > maxYear){ year = maxYear; month = 11; }
+      return [year, month];
+    }
+
+    function renderMonth(year, monthIndex){
+      monthSel.value = String(monthIndex);
+      yearSel.value  = String(year);
+
+      calGrid.querySelectorAll('.chiro-cal-day').forEach(n => n.remove());
+
+      const cells = getMonthMatrix(year, monthIndex);
+      cells.forEach(cell => {
+        const d = new Date(cell.date); d.setHours(0,0,0,0);
+        const dayKey = ymd(d);
+
+        const day = document.createElement('div');
+        day.className = 'chiro-cal-day' + (cell.out ? ' out' : '');
+        day.dataset.date = dayKey;
+
+        const isPast = d < today;
+        if(isPast) day.classList.add('disabled');
+
+        const num = document.createElement('div'); num.className = 'num'; num.textContent = d.getDate();
+        const dots = document.createElement('div'); dots.className = 'dots';
+        const dot = document.createElement('div'); dot.className = 'dot ' + dayOccupancy(dayKey);
+        dots.appendChild(dot);
+
+        day.appendChild(num); day.appendChild(dots);
+
+        if(!cell.out && !isPast){ day.addEventListener('click', () => openPopFor(day, dayKey)); }
+        calGrid.appendChild(day);
+      });
+    }
+
+    let anchorDayEl = null;
+    function openPopFor(dayEl, dayKey){
+      anchorDayEl = dayEl;
+      pop.classList.add('show'); pop.setAttribute('aria-hidden','false'); pop.dataset.date = dayKey;
+      const [y,m,d] = dayKey.split('-'); popDateLabel.textContent = `${d}.${m}.${y}`;
+      const st = slotStateFor(dayKey);
+      document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+        const slot = btn.dataset.slot;
+        btn.classList.toggle('selected', !!st[slot]);
+        btn.classList.remove('busy');
+      });
+    }
+
+    function closePop(){ pop.classList.remove('show'); pop.setAttribute('aria-hidden','true'); anchorDayEl = null; }
+
+    document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dayKey = pop.dataset.date;
+        const st = slotStateFor(dayKey);
+        const slot = btn.dataset.slot;
+
+        st[slot] = !st[slot];
+        btn.classList.toggle('selected', !!st[slot]);
+
+        if(anchorDayEl){
+          const dot = anchorDayEl.querySelector('.dot');
+          dot.className = 'dot ' + dayOccupancy(dayKey);
+        }
+        daySlots.set(dayKey, st);
+        saveSlots();
+      });
+    });
+
+    popClose.addEventListener('click', closePop);
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePop(); });
+    document.addEventListener('click', (e)=>{
+      if(pop.classList.contains('show')){
+        const insidePop = pop.contains(e.target);
+        const clickedDay = anchorDayEl && anchorDayEl.contains(e.target);
+        if(!insidePop && !clickedDay) closePop();
+      }
+    });
+
+    btnPrev.addEventListener('click', () => { [viewYear, viewMonth] = clampYearMonth(viewYear, viewMonth - 1); renderMonth(viewYear, viewMonth); });
+    btnNext.addEventListener('click', () => { [viewYear, viewMonth] = clampYearMonth(viewYear, viewMonth + 1); renderMonth(viewYear, viewMonth); });
+    monthSel.addEventListener('change', () => { viewMonth = parseInt(monthSel.value, 10); renderMonth(viewYear, viewMonth); });
+    yearSel.addEventListener('change', () => { viewYear = Math.min(Math.max(parseInt(yearSel.value,10), minYear), maxYear); renderMonth(viewYear, viewMonth); });
+
+    fillYearOptions();
+    loadSlots();
+    if(now.getFullYear() < minYear){ viewYear=minYear; viewMonth=0; }
+    if(now.getFullYear() > maxYear){ viewYear=maxYear; viewMonth=11; }
+    renderMonth(viewYear, viewMonth);
+  })();
+  </script>
+
+  <script>
+  /* Бележка за зает слот (само за админ) */
+  (() => {
+    const isAdmin = true; // смени на false за клиентите
+
+    const pop = document.getElementById('calPop');
+    const noteWrap = document.getElementById('noteWrap');
+    const noteSlotLabel = document.getElementById('noteSlotLabel');
+    const slotNote = document.getElementById('slotNote');
+    const saveNoteBtn = document.getElementById('saveNoteBtn');
+
+    const LS_PREFIX = 'CHIRO_NOTE|';
+    const noteKey = (d, s) => `${LS_PREFIX}${d}|${s}`;
+    const saveNote = (d, s, t) => { try { localStorage.setItem(noteKey(d, s), t || ''); } catch(e) {} };
+    const loadNote = (d, s) => { try { return localStorage.getItem(noteKey(d, s)) || ''; } catch(e) { return ''; } };
+
+    const slotBtns = document.querySelectorAll('#calPop .slot-btn');
+
+    slotBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dayKey = pop.dataset.date;
+        const slot = btn.dataset.slot;
+        const selected = btn.classList.contains('selected'); // след toggle от календара
+
+        if (isAdmin && selected) {
+          noteWrap.hidden = false;
+          noteSlotLabel.textContent = slot;
+          slotNote.value = loadNote(dayKey, slot);
+          noteWrap.dataset.date = dayKey;
+          noteWrap.dataset.slot = slot;
+        } else {
+          noteWrap.hidden = true;
+        }
+      });
+    });
+
+    saveNoteBtn.addEventListener('click', () => {
+      const d = noteWrap.dataset.date;
+      const s = noteWrap.dataset.slot;
+      if (!d || !s) return;
+      saveNote(d, s, slotNote.value.trim());
+      saveNoteBtn.animate([{opacity:1},{opacity:.4},{opacity:1}],{duration:250});
+    });
+  })();
+  </script>
+
+</body>
+</html>
