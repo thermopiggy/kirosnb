@@ -602,6 +602,92 @@
   renderMonth(viewYear, viewMonth);
 })();
 </script>
+<script>
+/* === Бележка за зает слот (само за админ) === */
+(() => {
+  const isAdmin = true; // ← смени на false за клиентите
+
+  const pop = document.getElementById('calPop');
+  const noteWrap = document.getElementById('noteWrap');
+  const noteSlotLabel = document.getElementById('noteSlotLabel');
+  const slotNote = document.getElementById('slotNote');
+  const saveNoteBtn = document.getElementById('saveNoteBtn');
+
+  const LS_PREFIX = 'CHIRO_NOTE|';
+  const noteKey = (d, s) => `${LS_PREFIX}${d}|${s}`;
+  const saveNote = (d, s, t) => { 
+    try {
+      localStorage.setItem(noteKey(d, s), t || '');
+    } catch(e) {
+      console.warn('Грешка при запис на бележка:', e);
+    }
+  };
+  const loadNote = (d, s) => { 
+    try {
+      return localStorage.getItem(noteKey(d, s)) || '';
+    } catch(e) {
+      console.warn('Грешка при четене на бележка:', e);
+      return '';
+    }
+  };
+
+  const slotBtns = document.querySelectorAll('#calPop .slot-btn');
+
+  slotBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dayKey = pop.dataset.date;
+      const slot = btn.dataset.slot;
+      const selected = !btn.classList.contains('selected');
+
+      // превключваме състоянието
+      btn.classList.toggle('selected', selected);
+
+      // само админ вижда и може да пише бележки
+      if (isAdmin && selected) {
+        noteWrap.hidden = false;
+        noteSlotLabel.textContent = slot;
+        slotNote.value = loadNote(dayKey, slot);
+        noteWrap.dataset.date = dayKey;
+        noteWrap.dataset.slot = slot;
+      } else {
+        noteWrap.hidden = true;
+      }
+    });
+  });
+
+  saveNoteBtn.addEventListener('click', () => {
+    const d = noteWrap.dataset.date;
+    const s = noteWrap.dataset.slot;
+    if (!d || !s) return;
+
+    const text = slotNote.value.trim();
+    saveNote(d, s, text);
+
+    // визуална обратна връзка при запис
+    saveNoteBtn.animate(
+      [{ opacity: 1 }, { opacity: 0.4 }, { opacity: 1 }],
+      { duration: 250, iterations: 1 }
+    );
+
+    // маркираме бутона със записана бележка (зелен борд)
+    const btn = document.querySelector(`#calPop .slot-btn[data-slot="${CSS.escape(s)}"]`);
+    if (btn && text) {
+      btn.classList.add('selected');
+      btn.style.outline = '2px solid #2e7d32';
+      btn.style.background = 'rgba(46,125,50,.15)';
+    }
+  });
+
+  // При скриване на popup бележката се крие
+  document.addEventListener('click', (e) => {
+    if (pop.classList.contains('show')) {
+      const insidePop = pop.contains(e.target);
+      if (!insidePop) noteWrap.hidden = true;
+    }
+  });
+
+})();
+</script>
 
 </body>
 </html>
