@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chiro – Snowboard Lessons</title>
+  <meta name="description" content="Chiro Snowboard Lessons – История, Уроци, Цени, Календар." />
+  <style>
+    :root{
+      --chiro-bg: rgba(15,17,20,.55);
+      --chiro-blur: blur(8px);
+      --chiro-border: rgba(255,255,255,.1);
+      --chiro-text: #f2f5f7;
+      --chiro-brand: #ffffff;
+      --chiro-wa: #25D366;
+      --chiro-viber: #7360F2;
+      --chiro-phone: #1E88E5;
+      --card-bg: rgba(255,255,255,.04);
+    }
+    html,body{height:100%;margin:0}
+    html{scroll-behavior:smooth}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#e9eef2;background:#0b0e12;scroll-padding-top:70px}
+    a{color:inherit}
+
+    /* === NAVBAR === */
+    .chiro-navbar{
+      position:fixed; inset:0 0 auto 0; height:60px;
+      display:grid; grid-template-columns:auto 1fr auto; align-items:center;
+      gap:.5rem; padding:0 .5rem; z-index:1000;
+      color:var(--chiro-text);
+      background:var(--chiro-bg); backdrop-filter:var(--chiro-blur);
+      border-bottom:1px solid var(--chiro-border);
+    }
+    .chiro-left{display:flex; align-items:center; gap:.25rem}
+    .chiro-right{justify-self:end; display:flex; align-items:center; gap:.25rem}
+    .chiro-iconbtn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:40px; height:40px; border-radius:10px;
+      background:transparent; color:var(--chiro-text);
+      border:1px solid transparent; cursor:pointer; transition:.25s;
+    }
+    .chiro-iconbtn:hover{background:rgba(255,255,255,.08);border-color:var(--chiro-border)}
+    .chiro-logo{justify-self:center;font-weight:800;letter-spacing:.5px;text-decoration:none;color:var(--chiro-brand);font-size:1.2rem}
+
+    /* === DRAWERS === */
+    .chiro-drawer{
+      position:fixed; inset:0 auto 0 0; width:min(86vw,320px);
+      transform:translateX(-102%); transition:transform .32s ease;
+      background:rgba(10,12,14,.75); backdrop-filter:var(--chiro-blur);
+      color:var(--chiro-text); z-index:1100;
+      border-right:1px solid var(--chiro-border);
+      display:flex; flex-direction:column; padding-bottom:1rem;
+    }
+    .chiro-drawer.open{transform:none}
+    .chiro-drawer-header{display:flex; align-items:center; gap:.5rem; padding:.75rem}
+    .chiro-drawer-item{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:.9rem 1rem; text-decoration:none; color:var(--chiro-text);
+      border-top:1px solid var(--chiro-border); transition:background .2s;
+      background:transparent; cursor:pointer; font:inherit;
+    }
+    .chiro-drawer-item:hover{background:rgba(255,255,255,.06)}
+    .chiro-subdrawer{ left:0; z-index:1150; }
+    .chiro-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
+      opacity:0; pointer-events:none; transition:opacity .25s; z-index:1090;
+    }
+    .chiro-overlay.show{opacity:1; pointer-events:auto}
+
+    /* === FLOATING CONTACT BUTTONS === */
+    .chiro-fabwrap{
+      position:fixed; right:16px; bottom:16px; z-index:1000;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .chiro-fab{
+      width:52px; height:52px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(25,28,32,.55); backdrop-filter:var(--chiro-blur);
+      color:#e8eef3; border:1px solid var(--chiro-border);
+      box-shadow:0 4px 14px rgba(0,0,0,.25);
+      transition:transform .15s, background-color .2s, color .2s, opacity .2s;
+      opacity:.92;
+    }
+    .chiro-fab:hover{transform:translateY(-2px); opacity:1}
+    .chiro-wa:hover{background:var(--chiro-wa); color:#fff}
+    .chiro-viber:hover{background:var(--chiro-viber); color:#fff}
+    .chiro-phone:hover{background:var(--chiro-phone); color:#fff}
+
+    /* === LAYOUT SECTIONS === */
+    .section{padding:72px 16px; max-width:1100px; margin:0 auto}
+    .section h2{margin:0 0 12px; font-size:clamp(22px,4.5vw,34px)}
+    .card{background:var(--card-bg); border:1px solid var(--chiro-border); border-radius:16px; padding:16px}
+    .grid{display:grid; gap:14px}
+    .grid.cols-2{grid-template-columns:1fr; }
+    @media (min-width:800px){ .grid.cols-2{grid-template-columns:1fr 1fr} }
+
+    /* === HERO / DEMO === */
+    .hero{
+      min-height:100vh; display:grid; place-items:center; padding-top:60px;
+      background:radial-gradient(1200px 600px at 70% 10%,rgba(255,255,255,.06),transparent 60%),
+                 linear-gradient(#0b0e12,#0b0e12);
+      text-align:center;
+    }
+    .hero h1{margin:0 1rem; font-size:clamp(28px,6vw,60px); line-height:1.05}
+    .hero p{opacity:.8; margin:.5rem 1rem 0}
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="chiro-navbar">
+    <div class="chiro-left">
+      <!-- Hamburger -->
+      <button id="chiroHamburger" class="chiro-iconbtn" aria-label="Меню" aria-expanded="false">
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <!-- Pin (локация) -->
+      <button class="chiro-iconbtn" aria-label="Локация (скоро линк)">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 22s7-5.4 7-12a7 7 0 1 0-14 0c0 6.6 7 12 7 12zM12 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor"/>
+        </svg>
+      </button>
+      <!-- Камера (live камери) -->
+      <button class="chiro-iconbtn" aria-label="Live камера (скоро линк)">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 3v-9l-4 3z" fill="currentColor"/>
+        </svg>
+      </button>
+      <!-- Време (прогноза) -->
+      <button class="chiro-iconbtn" aria-label="Време (скоро линк)">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.5 13a5.5 5.5 0 1 1 5.5 5.5A5.5 5.5 0 0 1 6.5 13zm5.5-9V1m0 22v-3m7.8-12.3l2.1-2.1M2.6 21.4l2.1-2.1m0-12.3L2.6 4.9M21.4 21.4l-2.1-2.1M1 13h3m16 0h3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <a href="#" class="chiro-logo" aria-label="Chiro – Snowboard Lessons">Chiro</a>
+    <div class="chiro-right"></div>
+  </nav>
+
+  <!-- MAIN DRAWER -->
+  <aside id="chiroDrawer" class="chiro-drawer" aria-hidden="true">
+    <div class="chiro-drawer-header">
+      <button id="chiroDrawerClose" class="chiro-iconbtn" aria-label="Затвори меню">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <strong>Меню</strong>
+    </div>
+    <a href="#history" class="chiro-drawer-item">История</a>
+    <button id="chiroLessonsBtn" class="chiro-drawer-item" aria-haspopup="true" aria-expanded="false">
+      Уроци <span aria-hidden="true">▸</span>
+    </button>
+    <a href="#prices" class="chiro-drawer-item">Цени</a>
+    <a href="#calendar" class="chiro-drawer-item">Календар</a>
+  </aside>
+
+  <!-- SUB-DRAWER: УРОЦИ -->
+  <aside id="chiroLessonsDrawer" class="chiro-drawer chiro-subdrawer" aria-hidden="true">
+    <div class="chiro-drawer-header">
+      <button id="chiroLessonsBack" class="chiro-iconbtn" aria-label="Назад">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <strong>Уроци</strong>
+    </div>
+    <a href="#lvl0" class="chiro-drawer-item">Без опит</a>
+    <a href="#lvl1" class="chiro-drawer-item">С малко опит</a>
+    <a href="#lvl2" class="chiro-drawer-item">С много опит</a>
+  </aside>
+
+  <!-- OVERLAY -->
+  <div class="chiro-overlay" aria-hidden="true"></div>
+
+  <!-- FLOATING CONTACT BUTTONS -->
+  <div class="chiro-fabwrap" aria-label="Контакти">
+    <a class="chiro-fab chiro-wa" href="https://wa.me/XXXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M19.1 17.3c-.3-.2-1.8-.9-2-.9s-.5-.1-.7.3-.8.9-.9 1.1-.3.2-.6.1-1.1-.4-2.1-1.3c-.8-.7-1.3-1.6-1.5-1.8s0-.4.2-.6c.2-.2.4-.5.5-.7.2-.2.2-.4.3-.6 0-.2 0-.4 0-.6s-.7-1.8-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9 1.2 3.3 1.4 3.6 2.4 3.6 5.8 5 3.5.9 4.1 1 .9.1 1.3.1 1.3-.5 1.5-1.1.2-1 .2-1.1-.2-.3-.5-.5zM16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.4 1.7 6.3L3 29l6.9-1.8c1.8 1 3.9 1.6 6.1 1.6 7.2 0 13-5.8 13-13S23.2 3 16 3z" fill="currentColor"/></svg>
+    </a>
+    <a class="chiro-fab chiro-viber" href="viber://chat?number=%2BXXXXXXXXXX" aria-label="Viber">
+      <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M22.7 3H9.3C6.4 3 4 5.4 4 8.3v15.4C4 26.6 6.4 29 9.3 29h7.5l3.4 3 .1-3h2.4c2.9 0 5.3-2.4 5.3-5.3V8.3C28 5.4 25.6 3 22.7 3zm-1.2 15.5c-.2.5-1 .9-1.4 1-.4.1-.9.1-1.5-.1-.3-.1-.7-.2-1.2-.4-2.1-.9-3.5-2.9-3.6-3-.1-.1-.9-1.2-.9-2.3s.6-1.7.8-2 .4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.6 1.7.6 1.8.1.2.1.4 0 .6-.1.2-.2.4-.3.5-.1.1-.2.3-.1.5.1.2.5.8 1.1 1.4.7.7 1.4.9 1.6 1 .2.1.4.1.6 0 .2-.1 1-.5 1.1-.6s.3-.1.5 0 .9.4 1.1.5c.2.1.4.2.5.3.1.1.1.7-.1 1.2z" fill="currentColor"/></svg>
+    </a>
+    <a class="chiro-fab chiro-phone" href="tel:+359XXXXXXXX" aria-label="Обаждане">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2c-3.6-.3-7.1-2-9.8-4.7S3.6 10.8 3.3 7.2A2 2 0 0 1 5.3 5h3a1 1 0 0 1 1 .8l.7 3.2a1 1 0 0 1-.3 1l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a1 1 0 0 1 1-.3l3.2.7a1 1 0 0 1 .8 1z" fill="currentColor"/></svg>
+    </a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div>
+      <h1>Chiro Snowboard Lessons</h1>
+      <p>Професионални уроци – от първи стъпки до фрийрайд. Менюто е горе вляво.</p>
+    </div>
+  </section>
+
+  <!-- ИСТОРИЯ -->
+  <section id="history" class="section">
+    <h2>История</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <p>Кратък текст за Чиро – опит, сертификати, стил на преподаване, локации.</p>
+      </div>
+      <div class="card">
+        <p>Акценти: безопасност, индивидуален подход, прогрес още от първия ден.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- УРОЦИ -->
+  <section id="lessons" class="section">
+    <h2>Уроци</h2>
+    <div class="grid">
+      <div id="lvl0" class="card">
+        <h3>Без опит</h3>
+        <p>Първи стъпки, баланс, плъзгане, спиране, лифт етикет.</p>
+      </div>
+      <div id="lvl1" class="card">
+        <h3>С малко опит</h3>
+        <p>Свързани завои, контрол на скоростта, разнообразни терени.</p>
+      </div>
+      <div id="lvl2" class="card">
+        <h3>С много опит</h3>
+        <p>Техника за дълбок сняг, карвинг, фрийрайд линии и безопасност.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЦЕНИ -->
+  <section id="prices" class="section">
+    <h2>Цени</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>Индивидуален урок</h3>
+        <p>2 часа / 3 часа / цял ден. Цена: плейсхолдър.</p>
+      </div>
+      <div class="card">
+        <h3>Групов урок</h3>
+        <p>До 4 души. Пакети за няколко дни. Цена: плейсхолдър.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- КАЛЕНДАР -->
+  <section id="calendar" class="section">
+    <h2>Календар</h2>
+    <div class="card">
+      <p>Тук ще вградиш календара за заетост/резервации.</p>
+      <!-- placeholder за бъдещ widget -->
+      <div style="height:260px; display:grid; place-items:center; border:1px dashed rgba(255,255,255,.2); border-radius:12px; margin-top:8px;">
+        <span>Календар placeholder</span>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // === CHIRO NAV & DRAWERS ===
+    (() => {
+      const drawer = document.getElementById('chiroDrawer');
+      const sub = document.getElementById('chiroLessonsDrawer');
+      const burger = document.getElementById('chiroHamburger');
+      const closeMain = document.getElementById('chiroDrawerClose');
+      const lessonsBtn = document.getElementById('chiroLessonsBtn');
+      const lessonsBack = document.getElementById('chiroLessonsBack');
+      const overlay = document.querySelector('.chiro-overlay');
+
+      const openMain = () => {
+        drawer.classList.add('open');
+        overlay.classList.add('show');
+        burger.setAttribute('aria-expanded','true');
+        drawer.setAttribute('aria-hidden','false');
+      };
+      const closeMainFn = () => {
+        drawer.classList.remove('open');
+        overlay.classList.remove('show');
+        burger.setAttribute('aria-expanded','false');
+        drawer.setAttribute('aria-hidden','true');
+        closeSub();
+      };
+      const openSub = () => {
+        sub.classList.add('open');
+        sub.setAttribute('aria-hidden','false');
+        lessonsBtn.setAttribute('aria-expanded','true');
+      };
+      const closeSub = () => {
+        sub.classList.remove('open');
+        sub.setAttribute('aria-hidden','true');
+        lessonsBtn.setAttribute('aria-expanded','false');
+      };
+
+      burger.addEventListener('click', openMain);
+      closeMain.addEventListener('click', closeMainFn);
+      overlay.addEventListener('click', closeMainFn);
+
+      lessonsBtn.addEventListener('click', () => {
+        if(!drawer.classList.contains('open')) openMain();
+        openSub();
+      });
+      lessonsBack?.addEventListener('click', () => closeSub());
+
+      // Клик по линк в който и да е drawer => затваря
+      document.querySelectorAll('.chiro-drawer a').forEach(a=>{
+        a.addEventListener('click', () => {
+          closeMainFn();
+        });
+      });
+
+      // ESC
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape'){
+          if(sub.classList.contains('open')) { closeSub(); return; }
+          if(drawer.classList.contains('open')) { closeMainFn(); }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
