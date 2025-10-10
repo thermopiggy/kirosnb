@@ -103,6 +103,59 @@
     }
     .hero h1{margin:0 1rem; font-size:clamp(28px,6vw,60px); line-height:1.05}
     .hero p{opacity:.8; margin:.5rem 1rem 0}
+
+    /* === CHIRO CALENDAR v1 (visual + 3 time slots) === */
+.chiro-cal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.chiro-cal-title{font-weight:700; letter-spacing:.4px}
+
+.chiro-cal-grid{
+  display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
+  user-select:none;
+}
+.chiro-cal-dow{
+  text-align:center; opacity:.75; font-size:.9rem; padding:.4rem 0;
+  border-bottom:1px dashed var(--chiro-border);
+}
+.chiro-cal-day{
+  position:relative; min-height:74px; border:1px solid var(--chiro-border);
+  border-radius:12px; padding:8px; background:rgba(255,255,255,.03);
+  display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:.15s;
+}
+.chiro-cal-day:hover{background:rgba(255,255,255,.06)}
+.chiro-cal-day.out{opacity:.45; filter:saturate(.7)}
+.chiro-cal-day .num{font-weight:700; font-size:.95rem}
+.chiro-cal-day .dots{margin-top:auto; display:flex; gap:6px}
+.dot{
+  width:8px; height:8px; border-radius:50%; opacity:.7; border:1px solid var(--chiro-border);
+}
+.dot.free{background:#2e7d32}
+.dot.partial{background:#f9a825}
+.dot.full{background:#c62828}
+
+/* Popup */
+.chiro-cal-pop{
+  position:fixed; inset:auto 16px 16px auto; z-index:1200;
+  width:min(94vw,360px); border:1px solid var(--chiro-border);
+  border-radius:14px; background:rgba(10,12,14,.9); backdrop-filter:blur(8px);
+  padding:12px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+  transform:translateY(10px); opacity:0; pointer-events:none; transition:.18s;
+}
+.chiro-cal-pop.show{transform:none; opacity:1; pointer-events:auto}
+.chiro-cal-pop-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+.chiro-cal-pop-x{
+  background:transparent; border:1px solid var(--chiro-border); color:var(--chiro-text);
+  width:28px; height:28px; border-radius:8px; cursor:pointer;
+}
+.chiro-cal-slots{display:flex; flex-direction:column; gap:8px}
+.slot-btn{
+  width:100%; padding:.65rem .8rem; border-radius:10px; border:1px solid var(--chiro-border);
+  background:rgba(255,255,255,.04); color:var(--chiro-text); cursor:pointer; text-align:left; transition:.15s;
+}
+.slot-btn:hover{background:rgba(255,255,255,.08)}
+.slot-btn.selected{outline:2px solid #2e7d32; background:rgba(46,125,50,.15)}
+.slot-btn.busy{opacity:.5; text-decoration:line-through}
+.chiro-cal-note{opacity:.7; font-size:.85rem; margin-top:6px}
+
   </style>
 </head>
 <body>
@@ -239,16 +292,43 @@
   </section>
 
   <!-- КАЛЕНДАР -->
-  <section id="calendar" class="section">
-    <h2>Календар</h2>
-    <div class="card">
-      <p>Тук ще вградиш календара за заетост/резервации.</p>
-      <!-- placeholder за бъдещ widget -->
-      <div style="height:260px; display:grid; place-items:center; border:1px dashed rgba(255,255,255,.2); border-radius:12px; margin-top:8px;">
-        <span>Календар placeholder</span>
-      </div>
+ <!-- ▼ ЗАМЕНИ само вътрешния блок на секция #calendar с това -->
+<section id="calendar" class="section">
+  <h2>Календар</h2>
+  <div class="card">
+    <div class="chiro-cal-head">
+      <div class="chiro-cal-title" id="calTitle">Месец ГГГГ</div>
+      <!-- навигацията ще дойде в Стъпка 2 -->
     </div>
-  </section>
+
+    <div class="chiro-cal-grid" id="calGrid">
+      <!-- дни от седмицата -->
+      <div class="chiro-cal-dow">Пн</div>
+      <div class="chiro-cal-dow">Вт</div>
+      <div class="chiro-cal-dow">Ср</div>
+      <div class="chiro-cal-dow">Чт</div>
+      <div class="chiro-cal-dow">Пт</div>
+      <div class="chiro-cal-dow">Сб</div>
+      <div class="chiro-cal-dow">Нд</div>
+      <!-- датите се рендерират от JS -->
+    </div>
+
+    <!-- slot попъп -->
+    <div class="chiro-cal-pop" id="calPop" aria-hidden="true">
+      <div class="chiro-cal-pop-head">
+        <strong id="popDateLabel">Дата</strong>
+        <button class="chiro-cal-pop-x" id="popClose" aria-label="Затвори">✕</button>
+      </div>
+      <div class="chiro-cal-slots">
+        <button class="slot-btn" data-slot="09:00-11:00">09:00–11:00</button>
+        <button class="slot-btn" data-slot="11:00-13:00">11:00–13:00</button>
+        <button class="slot-btn" data-slot="13:00-15:00">13:00–15:00</button>
+      </div>
+      <div class="chiro-cal-note">Демо: локално маркиране (без запис). Airbnb-стил поведение идва в Стъпка 2–3.</div>
+    </div>
+  </div>
+</section>
+
 
   <script>
     // === CHIRO NAV & DRAWERS ===
@@ -311,5 +391,187 @@
       });
     })();
   </script>
+  <script>
+/* === CHIRO CALENDAR v1: визуал + 3 слота/ден (локално) === */
+(() => {
+  const startYear = 2025;   // в Стъпка 2 ще добавим навигация до 2050
+  const monthsBg = ["Януари","Февруари","Март","Април","Май","Юни","Юли","Август","Септември","Октомври","Ноември","Декември"];
+
+  // За СТЪПКА 1: показваме текущия месец (ако е преди 2025, фиксираме януари 2025)
+  const now = new Date();
+  let viewYear  = Math.max(now.getFullYear(), startYear);
+  let viewMonth = (viewYear === startYear && now.getFullYear() < startYear) ? 0 : now.getMonth();
+
+  const calTitle = document.getElementById('calTitle');
+  const calGrid  = document.getElementById('calGrid');
+  const pop      = document.getElementById('calPop');
+  const popClose = document.getElementById('popClose');
+  const popDateLabel = document.getElementById('popDateLabel');
+
+  // Локално състояние: { 'YYYY-MM-DD': { '09:00-11:00':true/false, ... } }
+  const daySlots = new Map();
+
+  function ymd(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd= String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  function getMonthMatrix(year, monthIndex){
+    // начало на месеца
+    const first = new Date(year, monthIndex, 1);
+    const startDay = (first.getDay() + 6) % 7; // понеделник=0
+    const daysInMonth = new Date(year, monthIndex+1, 0).getDate();
+
+    // предходни дни за да запълнят първия ред
+    const prevDays = startDay;
+    const prevMonthDays = new Date(year, monthIndex, 0).getDate();
+
+    const cells = [];
+    // предходни
+    for(let i=prevDays; i>0; i--){
+      const d = new Date(year, monthIndex-1, prevMonthDays - i + 1);
+      cells.push({date:d, out:true});
+    }
+    // текущи
+    for(let i=1; i<=daysInMonth; i++){
+      const d = new Date(year, monthIndex, i);
+      cells.push({date:d, out:false});
+    }
+    // следващи за запълване на 6 реда (42 клетки)
+    while(cells.length % 7 !== 0) {
+      const last = cells[cells.length-1].date;
+      const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
+      cells.push({date:d, out:true});
+    }
+    // гарантираме 6 реда (42 клетки), Airbnb стил
+    while(cells.length < 42){
+      const last = cells[cells.length-1].date;
+      const d = new Date(last.getFullYear(), last.getMonth(), last.getDate()+1);
+      cells.push({date:d, out:true});
+    }
+    return cells;
+  }
+
+  function slotStateFor(dayKey){
+    if(!daySlots.has(dayKey)){
+      daySlots.set(dayKey, {
+        "09:00-11:00": false,
+        "11:00-13:00": false,
+        "13:00-15:00": false
+      });
+    }
+    return daySlots.get(dayKey);
+  }
+
+  function dayOccupancy(dayKey){
+    const st = slotStateFor(dayKey);
+    const vals = Object.values(st);
+    const taken = vals.filter(Boolean).length;
+    if(taken === 0) return 'free';
+    if(taken === vals.length) return 'full';
+    return 'partial';
+  }
+
+  function renderMonth(year, monthIndex){
+    calTitle.textContent = `${monthsBg[monthIndex]} ${year}`;
+    // махаме старите дни (но оставяме заглавията на дните – първите 7 div-а)
+    const nodes = Array.from(calGrid.querySelectorAll('.chiro-cal-day'));
+    nodes.forEach(n => n.remove());
+
+    const cells = getMonthMatrix(year, monthIndex);
+    cells.forEach(cell => {
+      const d = cell.date;
+      const dayKey = ymd(d);
+      const day = document.createElement('div');
+      day.className = 'chiro-cal-day' + (cell.out ? ' out' : '');
+      day.dataset.date = dayKey;
+
+      const num = document.createElement('div');
+      num.className = 'num';
+      num.textContent = d.getDate();
+
+      const dots = document.createElement('div');
+      dots.className = 'dots';
+      // една точка, която показва заетостта на деня (free/partial/full)
+      const dot = document.createElement('div');
+      dot.className = 'dot ' + dayOccupancy(dayKey);
+      dots.appendChild(dot);
+
+      day.appendChild(num);
+      day.appendChild(dots);
+
+      // само дни от текущия месец са кликаеми (Airbnb UX)
+      if(!cell.out){
+        day.addEventListener('click', (e) => openPopFor(day, dayKey));
+      } else {
+        day.style.pointerEvents = 'none';
+      }
+
+      calGrid.appendChild(day);
+    });
+  }
+
+  let anchorDayEl = null;
+  function openPopFor(dayEl, dayKey){
+    anchorDayEl = dayEl;
+
+    // позициониране близо до долния десен ъгъл: (СТЪПКА 1 – опростено, фиксирано долу вдясно)
+    pop.classList.add('show');
+    pop.setAttribute('aria-hidden','false');
+    pop.dataset.date = dayKey;
+
+    // Етикет дата
+    const [y,m,d] = dayKey.split('-');
+    popDateLabel.textContent = `${d}.${m}.${y}`;
+
+    // зареждане на състоянието
+    const st = slotStateFor(dayKey);
+    document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+      const slot = btn.dataset.slot;
+      btn.classList.toggle('selected', !!st[slot]);
+      btn.classList.remove('busy'); // за СТЪПКА 1 нямаме реални „busy“
+    });
+  }
+
+  function closePop(){
+    pop.classList.remove('show');
+    pop.setAttribute('aria-hidden','true');
+    anchorDayEl = null;
+  }
+
+  // Клик по слотовете
+  document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const dayKey = pop.dataset.date;
+      const st = slotStateFor(dayKey);
+      const slot = btn.dataset.slot;
+      st[slot] = !st[slot];       // toggle
+      btn.classList.toggle('selected', !!st[slot]);
+
+      // обновяваме „точката“ (free/partial/full)
+      if(anchorDayEl){
+        const dot = anchorDayEl.querySelector('.dot');
+        dot.className = 'dot ' + dayOccupancy(dayKey);
+      }
+    });
+  });
+
+  popClose.addEventListener('click', closePop);
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePop(); });
+  document.addEventListener('click', (e)=>{
+    if(pop.classList.contains('show')){
+      const insidePop = pop.contains(e.target);
+      const clickedDay = anchorDayEl && anchorDayEl.contains(e.target);
+      if(!insidePop && !clickedDay) closePop();
+    }
+  });
+
+  // Рендер
+  renderMonth(viewYear, viewMonth);
+})();
+</script>
+
 </body>
 </html>
