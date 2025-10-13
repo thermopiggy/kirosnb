@@ -179,6 +179,29 @@
     .slot-btn.selected{outline:2px solid #2e7d32; background:rgba(46,125,50,.15)}
     .slot-btn.busy{opacity:.5; text-decoration:line-through}
     .chiro-cal-note{opacity:.7; font-size:.85rem; margin-top:6px}
+
+
+    .hero {
+  background: url('fon.webp') center center / cover no-repeat fixed;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding-top: 60px;
+  text-align: center;
+  color: #fff;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.hero > div {
+  position: relative;
+  z-index: 1;
+}
+
+    
   </style>
 </head>
 <body>
