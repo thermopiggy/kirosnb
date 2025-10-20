@@ -346,6 +346,45 @@ body.light-mode .card {
   }
 }
 
+    /* Desktop: по-малко видео в секция "С много опит" */
+@media (min-width: 1000px){
+  #lvl2 video{
+    flex: 0 0 30%;
+    max-width: 30%;
+    height: auto;
+  }
+}
+
+    @media (max-width: 768px){
+  .card-lesson{               /* контейнерът на картата */
+    display: flex;
+    flex-direction: column;   /* подрежда елементите вертикално */
+    align-items: center;
+    text-align: center;
+  }
+  .card-lesson h3{            /* заглавие */
+    order: -1;                /* мести заглавието най-отгоре */
+    margin-bottom: 8px;
+  }
+  .card-lesson video,
+  .card-lesson img{
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+}
+
+    .hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 20px); /* започва 20px под надписа */
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+  pointer-events: none;
+}
+
   </style>
 </head>
 <body>
