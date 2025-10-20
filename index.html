@@ -227,6 +227,36 @@ body.light-mode .hero {
   color: #111;
 }
 
+    #lvl0 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#lvl0 video {
+  width: 300px;
+  max-width: 45%;
+  border-radius: 12px;
+}
+#lvl0 p {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+@media (max-width: 800px) {
+  #lvl0 {
+    flex-direction: column;
+    text-align: center;
+  }
+  #lvl0 video {
+    width: 80%;
+    max-width: 400px;
+  }
+  #lvl0 p {
+    font-size: 1.15rem;
+  }
+}
+
     
   </style>
 </head>
