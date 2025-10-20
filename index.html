@@ -385,6 +385,31 @@ body.light-mode .card {
   pointer-events: none;
 }
 
+    @media (max-width: 768px){
+  .card-lesson{
+    display: flex !important;
+    flex-direction: column !important;   /* всичко подред вертикално */
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .card-lesson h3{
+    order: -1;                           /* заглавието най-отгоре */
+    width: 100%;
+    margin: 8px 0 10px;
+  }
+
+  .card-lesson video,
+  .card-lesson img{
+    width: 100% !important;              /* да не излиза извън картата */
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -498,7 +523,8 @@ body.light-mode .card {
   <section id="lessons" class="section">
     <h2>Уроци</h2>
     <div class="grid">
-      <div id="lvl0" class="card"><h3>Без опит</h3>
+     <div id="lv10" class="card card-lesson">
+<h3>Без опит</h3>
         <!-- ТАКА (без style – всичко идва от CSS) -->
 <video autoplay muted loop playsinline>
   <source src="bez opit.mp4" type="video/mp4">
