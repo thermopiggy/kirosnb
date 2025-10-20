@@ -257,6 +257,20 @@ body.light-mode .hero {
   }
 }
 
+    /* Slots: без зелено, с размазване при запазен */
+.slot-btn{
+  transition: background .15s, opacity .15s, filter .15s;
+}
+.slot-btn.selected{
+  outline: none;
+  background: rgba(255,255,255,.04); /* без зелено */
+  filter: blur(1.6px);
+  opacity: .6;
+}
+.slot-btn.selected:hover{
+  filter: blur(1.6px);
+}
+
     
   </style>
 </head>
