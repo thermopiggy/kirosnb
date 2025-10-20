@@ -179,6 +179,237 @@
     .slot-btn.selected{outline:2px solid #2e7d32; background:rgba(46,125,50,.15)}
     .slot-btn.busy{opacity:.5; text-decoration:line-through}
     .chiro-cal-note{opacity:.7; font-size:.85rem; margin-top:6px}
+
+
+    .hero {
+  background: url('fon.webp') center center / cover no-repeat fixed;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding-top: 60px;
+  text-align: center;
+  color: #fff;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.hero > div {
+  position: relative;
+  z-index: 1;
+}
+
+#chiroHamburger {
+  position: absolute;
+  right: 8px;
+  top: 10px;
+}
+.chiro-right {
+  position: relative;
+}
+
+body.light-mode {
+  background: #f8fafc;
+  color: #222;
+}
+body.light-mode .chiro-navbar {
+  background: rgba(255,255,255,0.75);
+  color: #111;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+body.light-mode .card {
+  background: rgba(255,255,255,0.6);
+  border-color: rgba(0,0,0,0.1);
+}
+body.light-mode .hero {
+  color: #111;
+}
+
+    #lvl0 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#lvl0 video {
+  width: 300px;
+  max-width: 45%;
+  border-radius: 12px;
+}
+#lvl0 p {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+@media (max-width: 800px) {
+  #lvl0 {
+    flex-direction: column;
+    text-align: center;
+  }
+  #lvl0 video {
+    width: 80%;
+    max-width: 400px;
+  }
+  #lvl0 p {
+    font-size: 1.15rem;
+  }
+}
+
+    /* Slots: без зелено, с размазване при запазен */
+.slot-btn{
+  transition: background .15s, opacity .15s, filter .15s;
+}
+.slot-btn.selected{
+  outline: none;
+  background: rgba(255,255,255,.04); /* без зелено */
+  filter: blur(1.6px);
+  opacity: .6;
+}
+.slot-btn.selected:hover{
+  filter: blur(1.6px);
+}
+
+    /* ПАРЧЕ – долу в края на <style> */
+#lvl0 h3 { flex-basis: 100%; margin-bottom: 6px; }
+#lvl0 video { margin: 0; } /* за всеки случай */
+
+    /* Икона на луна по подразбиране */
+#themeIcon path {
+  fill: currentColor;
+}
+
+/* Видимост на всички икони при светъл режим */
+body.light-mode .chiro-iconbtn svg {
+  color: #111;
+  stroke: #111;
+  fill: #111;
+}
+
+/* В тъмен режим — светли икони */
+body:not(.light-mode) .chiro-iconbtn svg {
+  color: #fff;
+  stroke: #fff;
+  fill: #fff;
+}
+
+/* Navbar фон в светъл режим */
+body.light-mode .chiro-navbar {
+  background: rgba(255,255,255,0.85);
+  color: #111;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Hero и текстове в светъл режим */
+body.light-mode {
+  background: #f8fafc;
+  color: #222;
+}
+body.light-mode .card {
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(0,0,0,0.1);
+}
+
+    /* С много опит: видео и текст рамо до рамо */
+#lvl2 .lvl2-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+#lvl2 video {
+  flex: 0 0 45%;
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+
+#lvl2 p {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Мобилна версия */
+@media (max-width: 800px) {
+  #lvl2 .lvl2-wrap {
+    flex-direction: column;
+    text-align: center;
+  }
+  #lvl2 video {
+    width: 90%;
+  }
+  #lvl2 p {
+    font-size: 1.15rem;
+  }
+}
+
+    /* Desktop: по-малко видео в секция "С много опит" */
+@media (min-width: 1000px){
+  #lvl2 video{
+    flex: 0 0 30%;
+    max-width: 30%;
+    height: auto;
+  }
+}
+
+    @media (max-width: 768px){
+  .card-lesson{               /* контейнерът на картата */
+    display: flex;
+    flex-direction: column;   /* подрежда елементите вертикално */
+    align-items: center;
+    text-align: center;
+  }
+  .card-lesson h3{            /* заглавие */
+    order: -1;                /* мести заглавието най-отгоре */
+    margin-bottom: 8px;
+  }
+  .card-lesson video,
+  .card-lesson img{
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+}
+
+    .hero::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% + 20px); /* започва 20px под надписа */
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+  pointer-events: none;
+}
+
+    @media (max-width: 768px){
+  .card-lesson{
+    display: flex !important;
+    flex-direction: column !important;   /* всичко подред вертикално */
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .card-lesson h3{
+    order: -1;                           /* заглавието най-отгоре */
+    width: 100%;
+    margin: 8px 0 10px;
+  }
+
+  .card-lesson video,
+  .card-lesson img{
+    width: 100% !important;              /* да не излиза извън картата */
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -189,23 +420,34 @@
       <button id="chiroHamburger" class="chiro-iconbtn" aria-label="Меню" aria-expanded="false">
         <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <button class="chiro-iconbtn" aria-label="Локация">
-        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 22s7-5.4 7-12a7 7 0 1 0-14 0c0 6.6 7 12 7 12zM12 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor"/>
-        </svg>
-      </button>
-      <button class="chiro-iconbtn" aria-label="Live камери">
-        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 3v-9l-4 3z" fill="currentColor"/>
-        </svg>
-      </button>
-      <button class="chiro-iconbtn" aria-label="Време">
-        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6.5 13a5.5 5.5 0 1 1 5.5 5.5A5.5 5.5 0 0 1 6.5 13zm5.5-9V1m0 22v-3m7.8-12.3l2.1-2.1M2.6 21.4l2.1-2.1m0-12.3L2.6 4.9M21.4 21.4l-2.1-2.1M1 13h3m16 0h3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
-        </svg>
-      </button>
+    <a class="chiro-iconbtn" href="https://www.google.com/maps/place/Banderiska+Poljana/@41.7816658,23.438612,3a,75y,217.28h,98.18t/data=!3m8!1e1!3m6!1sCIHM0ogKEICAgICEm-bpUw!2e10!3e11!6shttps:%2F%2Flh3.googleusercontent.com%2Fgpms-cs-s%2FAB8u6Hb-E6qNLPZHoFrsh4twrL_QSy-y3ITelQuhoCIz9WYHR3Zgskby3oFnHmvkjkitUxgCS4gkKqR488q0Um8rhpV5_A9382a4paSJzJdzPU_bbi7n3JufA_3lwftT_AJXUqDXWssD%3Dw900-h600-k-no-pi-8.183283148663506-ya217.278234965793-ro0-fo100!7i7070!8i3535!4m14!1m7!3m6!1s0x14abb27a24c6bdb7:0xda99d61c80d6ccdf!2sBanderiska+Poljana!8m2!3d41.781966!4d23.439918!16s%2Fg%2F11c5smpvvt!3m5!1s0x14abb27a24c6bdb7:0xda99d61c80d6ccdf!8m2!3d41.781966!4d23.439918!16s%2Fg%2F11c5smpvvt?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D" 
+   target="_blank" aria-label="Локация">
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 22s7-5.4 7-12a7 7 0 1 0-14 0c0 6.6 7 12 7 12zM12 13a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor"/>
+  </svg>
+</a>
+
+     <a class="chiro-iconbtn" href="https://www.banskoski.com/en/webcam/bansko" target="_blank" aria-label="Live камери">
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M17 10.5V7a2 2 0 0 0-2-2H5A2 2 0 0 0 3 7v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3.5l4 3v-9l-4 3z" fill="currentColor"/>
+  </svg>
+</a>
+
+    <a class="chiro-iconbtn" href="https://www.snow-forecast.com/resorts/Bansko/6day/bot" target="_blank" aria-label="Време в Банско">
+  <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 19a4 4 0 1 1 .9-7.9A5.5 5.5 0 0 1 18 9a4.5 4.5 0 0 1 1 8.9H6z" fill="currentColor"/>
+    <path d="M12 22v-2m0-2v-2m0-2v-2m0-2v-2m0-2V4m0-2V0M10 20h4M8 18h8M6 16h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</a>
+
+      <button id="themeToggle" class="chiro-iconbtn" aria-label="Смени тема">
+  <svg id="themeIcon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 3a9 9 0 0 0 0 18 9 9 0 0 1 0-18z"/>
+  </svg>
+</button>
+
     </div>
-    <a href="#" class="chiro-logo" aria-label="Chiro – Snowboard Lessons">Chiro</a>
+    <a href="#" class="chiro-logo" aria-label="KiroSNB – Snowboard Lessons">KiroSNB</a>
     <div class="chiro-right"></div>
   </nav>
 
@@ -243,13 +485,13 @@
 
   <!-- FLOATING CONTACT BUTTONS -->
   <div class="chiro-fabwrap" aria-label="Контакти">
-    <a class="chiro-fab chiro-wa" href="https://wa.me/XXXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <a class="chiro-fab chiro-wa" href="https://wa.me+359988823462" target="_blank" rel="noopener" aria-label="WhatsApp">
       <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M19.1 17.3c-.3-.2-1.8-.9-2-.9s-.5-.1-.7.3-.8.9-.9 1.1-.3.2-.6.1-1.1-.4-2.1-1.3c-.8-.7-1.3-1.6-1.5-1.8s0-.4.2-.6c.2-.2.4-.5.5-.7.2-.2.2-.4.3-.6 0-.2 0-.4 0-.6s-.7-1.8-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4s-1.2 1.2-1.2 2.9 1.2 3.3 1.4 3.6 2.4 3.6 5.8 5 3.5.9 4.1 1 .9.1 1.3.1 1.3-.5 1.5-1.1.2-1 .2-1.1-.2-.3-.5-.5zM16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.4 1.7 6.3L3 29l6.9-1.8c1.8 1 3.9 1.6 6.1 1.6 7.2 0 13-5.8 13-13S23.2 3 16 3z" fill="currentColor"/></svg>
     </a>
-    <a class="chiro-fab chiro-viber" href="viber://chat?number=%2BXXXXXXXXXX" aria-label="Viber">
+    <a class="chiro-fab chiro-viber" href="viber://chat?number=%2B+359988823462" aria-label="Viber">
       <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><path d="M22.7 3H9.3C6.4 3 4 5.4 4 8.3v15.4C4 26.6 6.4 29 9.3 29h7.5l3.4 3 .1-3h2.4c2.9 0 5.3-2.4 5.3-5.3V8.3C28 5.4 25.6 3 22.7 3zm-1.2 15.5c-.2.5-1 .9-1.4 1-.4.1-.9.1-1.5-.1-.3-.1-.7-.2-1.2-.4-2.1-.9-3.5-2.9-3.6-3-.1-.1-.9-1.2-.9-2.3s.6-1.7.8-2 .4-.5.6-.5h.5c.2 0 .4 0 .5.4.2.5.6 1.7.6 1.8.1.2.1.4 0 .6-.1.2-.2.4-.3.5-.1.1-.2.3-.1.5.1.2.5.8 1.1 1.4.7.7 1.4.9 1.6 1 .2.1.4.1.6 0 .2-.1 1-.5 1.1-.6s.3-.1.5 0 .9.4 1.1.5c.2.1.4.2.5.3.1.1.1.7-.1 1.2z" fill="currentColor"/></svg>
     </a>
-    <a class="chiro-fab chiro-phone" href="tel:+359XXXXXXXX" aria-label="Обаждане">
+    <a class="chiro-fab chiro-phone" href="tel:+359988823462" aria-label="Обаждане">
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2c-3.6-.3-7.1-2-9.8-4.7S3.6 10.8 3.3 7.2A2 2 0 0 1 5.3 5h3a1 1 0 0 1 1 .8l.7 3.2a1 1 0 0 1-.3 1l-1.3 1.3a14 14 0 0 0 5.6 5.6l1.3-1.3a1 1 0 0 1 1-.3l3.2.7a1 1 0 0 1 .8 1z" fill="currentColor"/></svg>
     </a>
   </div>
@@ -257,27 +499,50 @@
   <!-- HERO -->
   <section class="hero" id="home">
     <div>
-      <h1>Chiro Snowboard Lessons</h1>
-      <p>Професионални уроци – от първи стъпки до фрийрайд. Менюто е горе вляво.</p>
+      <h1>KiroSNB Snowboard Lessons</h1>
+      <p>от първи стъпки до фрийрайд.</p>
     </div>
   </section>
 
   <!-- ИСТОРИЯ -->
   <section id="history" class="section">
     <h2>История</h2>
-    <div class="grid cols-2">
-      <div class="card"><p>Кратък текст за Чиро – опит, сертификати, стил на преподаване, локации.</p></div>
-      <div class="card"><p>Акценти: безопасност, индивидуален подход, прогрес още от първия ден.</p></div>
-    </div>
+   <div class="card">
+  <img src="rodeo.JPG" alt="Rodeo snowboarding" style="width:100%;border-radius:12px;margin-bottom:10px;">
+  <p>Киро преподава сноуборд от 2006г.Тогава взе и първия си сертификат -Сноуборд Инструктор Клас А. Днес той е инструктор клас C, натрупал опит от дългогодишна работа с хора от различни възрасти,култури и с различна физическа подготовка и характрери. </p>
+</div>
+
+<div class="card">
+  <img src="ryaz.webp" alt="Snowboard session" style="width:100%;border-radius:12px;margin-bottom:10px;">
+  <p>Акценти: безопасност, индивидуален подход, прогрес още от първия ден.</p>
+</div>
+
   </section>
 
   <!-- УРОЦИ -->
   <section id="lessons" class="section">
     <h2>Уроци</h2>
     <div class="grid">
-      <div id="lvl0" class="card"><h3>Без опит</h3><p>Първи стъпки, баланс, плъзгане, спиране, лифт етикет.</p></div>
-      <div id="lvl1" class="card"><h3>С малко опит</h3><p>Свързани завои, контрол на скоростта, разнообразни терени.</p></div>
-      <div id="lvl2" class="card"><h3>С много опит</h3><p>Карвинг, дълбок сняг, фрийрайд линии и безопасност.</p></div>
+     <div id="lv10" class="card card-lesson">
+<h3>Без опит</h3>
+        <!-- ТАКА (без style – всичко идва от CSS) -->
+<video autoplay muted loop playsinline>
+  <source src="bez opit.mp4" type="video/mp4">
+  Твоят браузър не поддържа видео.
+</video>
+<p>Запознаване със сноуборда - устройство,управлвние и етикет.Първи стъпки-баланс, плъзгане, завой и спиране. СВЛИЧАНЕ....</p></div>
+      <div id="lvl1" class="card"><h3>С малко опит</h3><p>Свързани завои, контрол на скоростта, разнообразни терени.Изчистване на техниката ВИСКО ОБЛЕКЧАВАНЕ и запознаване с карвинг</p></div>
+     <div id="lvl2" class="card">
+  <h3>С много опит</h3>
+  <div class="lvl2-wrap">
+    <video autoplay muted loop playsinline loading="lazy">
+      <source src="poveche.mp4" type="video/mp4">
+      Твоят браузър не поддържа видео.
+    </video>
+    <p>Изчистване на ниско облекчаване, карвинг, дълбок сняг, фрийрайд линии и безопасност.</p>
+  </div>
+</div>
+
     </div>
   </section>
 
@@ -285,8 +550,8 @@
   <section id="prices" class="section">
     <h2>Цени</h2>
     <div class="grid cols-2">
-      <div class="card"><h3>Индивидуален урок</h3><p>2 часа / 3 часа / цял ден. Цена: плейсхолдър.</p></div>
-      <div class="card"><h3>Групов урок</h3><p>До 4 души. Пакети за няколко дни. Цена: плейсхолдър.</p></div>
+      <div class="card"><h3>Индивидуален урок</h3><p>200 лв/2 часа.</p></div>
+      <div class="card"><h3>Групов урок</h3><p> ценоразпис......</p></div>
     </div>
   </section>
 
@@ -605,5 +870,25 @@
   })();
   </script>
 
+<script>
+const toggleBtn = document.getElementById('themeToggle');
+const icon = document.getElementById('themeIcon');
+
+function setLightMode(on) {
+  document.body.classList.toggle('light-mode', on);
+  if (on) {
+    icon.innerHTML = '<path d="M12 4.5A7.5 7.5 0 1 0 19.5 12 7.5 7.5 0 0 0 12 4.5zM12 2v2m0 16v2m10-10h-2M4 12H2m15.5-7.5-1.5 1.5M8 18l-1.5 1.5M18 18l-1.5-1.5M8 6 6.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/>';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }
+}
+toggleBtn.addEventListener('click', () => {
+  setLightMode(!document.body.classList.contains('light-mode'));
+});
+setLightMode(false);
+</script>
+
+
+  
 </body>
 </html>
