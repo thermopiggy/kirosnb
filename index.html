@@ -311,7 +311,41 @@ body.light-mode .card {
   border-color: rgba(0,0,0,0.1);
 }
 
-    
+    /* С много опит: видео и текст рамо до рамо */
+#lvl2 .lvl2-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+#lvl2 video {
+  flex: 0 0 45%;
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+
+#lvl2 p {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Мобилна версия */
+@media (max-width: 800px) {
+  #lvl2 .lvl2-wrap {
+    flex-direction: column;
+    text-align: center;
+  }
+  #lvl2 video {
+    width: 90%;
+  }
+  #lvl2 p {
+    font-size: 1.15rem;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -433,7 +467,17 @@ body.light-mode .card {
 </video>
 <p>Запознаване със сноуборда - устройство,управлвние и етикет.Първи стъпки-баланс, плъзгане, завой и спиране. СВЛИЧАНЕ....</p></div>
       <div id="lvl1" class="card"><h3>С малко опит</h3><p>Свързани завои, контрол на скоростта, разнообразни терени.Изчистване на техниката ВИСКО ОБЛЕКЧАВАНЕ и запознаване с карвинг</p></div>
-      <div id="lvl2" class="card"><h3>С много опит</h3><p>Изчистване на НИСКО ОБЛЕКЧАВАНЕ,Карвинг, дълбок сняг, фрийрайд линии и безопасност.</p></div>
+     <div id="lvl2" class="card">
+  <h3>С много опит</h3>
+  <div class="lvl2-wrap">
+    <video autoplay muted loop playsinline loading="lazy">
+      <source src="poveche.mp4" type="video/mp4">
+      Твоят браузър не поддържа видео.
+    </video>
+    <p>Изчистване на ниско облекчаване, карвинг, дълбок сняг, фрийрайд линии и безопасност. Подготовка за off-piste терени и усъвършенстване на контрола при висока скорост.</p>
+  </div>
+</div>
+
     </div>
   </section>
 
