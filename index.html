@@ -489,6 +489,32 @@ body{
   }
 }
 
+   #partners {
+  text-align: center;
+}
+#partners .logos {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+  margin-top: 20px;
+}
+#partners img {
+  height: 60px;
+  opacity: 0.9;
+  transition: opacity .2s, transform .2s;
+}
+#partners img:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+@media (max-width: 768px) {
+  #partners img {
+    height: 50px;
+  }
+}
+
     
   </style>
 </head>
@@ -699,6 +725,18 @@ body{
     </div>
   </section>
 
+  <!-- ПАРТНЬОРИ -->
+<section id="partners" class="section">
+  <h2>Партньори</h2>
+  <div class="logos">
+    <a href="https://www.banskoski.com" target="_blank"><img src="bansko-logo.webp" alt="Bansko Ski Resort"></a>
+    <a href="https://www.snow-forecast.com/resorts/Bansko/6day/bot" target="_blank"><img src="snowforecast-logo.webp" alt="Snow Forecast"></a>
+    <a href="https://www.webbadoo.com" target="_blank"><img src="webbadoo-logo.webp" alt="Webbadoo Web Design"></a>
+    <a href="https://www.skischoolcool.com" target="_blank"><img src="cool-logo.webp" alt="Ski School Cool"></a>
+  </div>
+</section>
+
+  
   <script>
     /* NAV + DRAWERS */
     (() => {
