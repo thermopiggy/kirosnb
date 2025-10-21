@@ -433,6 +433,37 @@ body{
   line-height: 1.5;
 }
 
+    #lvl1 .lvl1-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+#lvl1 video {
+  flex: 0 0 45%;
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+#lvl1 p {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+@media (max-width: 800px) {
+  #lvl1 .lvl1-wrap {
+    flex-direction: column;
+    text-align: center;
+  }
+  #lvl1 video {
+    width: 90%;
+  }
+  #lvl1 p {
+    font-size: 1.15rem;
+  }
+}
+
+    
   </style>
 </head>
 <body>
@@ -554,7 +585,17 @@ body{
   Твоят браузър не поддържа видео.
 </video>
 <p>Запознаване със сноуборда - устройство,управлвние и етикет.Първи стъпки-баланс, плъзгане, завой и спиране. СВЛИЧАНЕ....</p></div>
-      <div id="lvl1" class="card"><h3>С малко опит</h3><p>Свързани завои, контрол на скоростта, разнообразни терени.Изчистване на техниката ВИСКО ОБЛЕКЧАВАНЕ и запознаване с карвинг</p></div>
+    <div id="lvl1" class="card">
+  <h3>С малко опит</h3>
+  <div class="lvl1-wrap">
+    <video autoplay muted loop playsinline loading="lazy">
+      <source src="malko1.mp4" type="video/mp4">
+      Твоят браузър не поддържа видео.
+    </video>
+    <p>Свързани завои, контрол на скоростта и разнообразни терени. Изчистване на техниката, ниско облекчаване и първи стъпки в карвинга.</p>
+  </div>
+</div>
+
      <div id="lvl2" class="card">
   <h3>С много опит</h3>
   <div class="lvl2-wrap">
