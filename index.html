@@ -539,7 +539,7 @@ body{
 body.light-mode .cal-nav,
 body.light-mode #calMonth,
 body.light-mode #calYear {
-  border: 1px solid rgba(0,0,0,0.25);
+  border: 1px solid rgba(0,0,0,0.20);
 }
 
 body.light-mode .slot-btn:hover,
@@ -547,6 +547,16 @@ body.light-mode .cal-nav:hover,
 body.light-mode #calMonth:hover,
 body.light-mode #calYear:hover {
   background: rgba(0,0,0,0.05);
+}
+
+    /* Видими клетки в светъл режим */
+body.light-mode .chiro-cal-day{
+  background: rgba(0,0,0,0.02) !important;  /* лек сив фон за контраст */
+  border: 1px solid rgba(0,0,0,0.20) !important; /* фин, но отчетлив контур */
+}
+
+body.light-mode .chiro-cal-day:hover{
+  background: rgba(0,0,0,0.04) !important;  /* лек hover като в тъмен режим */
 }
 
   </style>
