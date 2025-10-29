@@ -559,6 +559,8 @@ body.light-mode .chiro-cal-day:hover{
   background: rgba(0,0,0,0.04) !important;  /* лек hover като в тъмен режим */
 }
 
+    .chiro-cal-date{font-size:.95rem; opacity:.85; margin:2px 0 10px;}
+
   </style>
 </head>
 <body>
@@ -748,6 +750,8 @@ body.light-mode .chiro-cal-day:hover{
           <strong id="popDateLabel">Дата</strong>
           <button class="chiro-cal-pop-x" id="popClose" aria-label="Затвори">✕</button>
         </div>
+
+        <div class="chiro-cal-date" id="popDayLine"></div>
 
         <!-- Бележка за зает слот (само за админ) -->
         <div class="chiro-cal-note-wrap" id="noteWrap" hidden>
