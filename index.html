@@ -963,7 +963,15 @@ body.light-mode .chiro-cal-day:hover{
     function openPopFor(dayEl, dayKey){
       anchorDayEl = dayEl;
       pop.classList.add('show'); pop.setAttribute('aria-hidden','false'); pop.dataset.date = dayKey;
-      const [y,m,d] = dayKey.split('-'); popDateLabel.textContent = `${d}.${m}.${y}`;
+      const [y,m,d] = dayKey.split('-').map(n=>parseInt(n,10));
+const weekdays = ["Неделя","Понеделник","Вторник","Сряда","Четвъртък","Петък","Събота"];
+const months   = ["януари","февруари","март","април","май","юни","юли","август","септември","октомври","ноември","декември"];
+const dt = new Date(y, m-1, d);
+const label = `${weekdays[dt.getDay()]} – ${d} ${months[dt.getMonth()]} ${y}`;
+popDateLabel.textContent = label;
+const dayLine = document.getElementById('popDayLine');
+if(dayLine) dayLine.textContent = label;
+
       const st = slotStateFor(dayKey);
       document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
         const slot = btn.dataset.slot;
