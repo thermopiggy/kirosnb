@@ -7,6 +7,12 @@
   <meta name="description" content="Chiro Snowboard Lessons – История, Уроци, Цени, Календар." />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 
+  <!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+
   <style>
     :root{
       --chiro-bg: rgba(15,17,20,.55);
@@ -1090,6 +1096,41 @@ toggleBtn.addEventListener('click', () => {
 setLightMode(false);
 </script>
 
+<script>
+/* Firebase INIT – същият проект като в index2 */
+const firebaseConfig = {
+  apiKey: "AIzaSyA2bfkzHl6IoLzy9Bz9gli2kL9airHuUCw",
+  authDomain: "lhv2-48243.firebaseapp.com",
+  projectId: "lhv2-48243",
+  storageBucket: "lhv2-48243.firebasestorage.app",
+  messagingSenderId: "394167863285",
+  appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+/* Колекция за сноуборд слотовете (отделно от календар_v2 на index2) */
+const CHIRO_COLL = 'snb_calendar_v1';
+
+/* Помощни */
+const pad = n => (n<10?'0':'')+n;
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+/* Кеш на месеци в паметта */
+const CHIRO_CACHE = new Map();
+
+/* Четене на месец: doc 'YYYY-MM' -> { days: { 'YYYY-MM-DD': { "09:00-11:00": true/false, "11:00-13:00": ..., "13:00-15:00": ..., notes?: {slot: text} } } } */
+async function chiroLoadMonth(year, monthIndex){
+  const id = `${year}-${pad(monthIndex+1)}`;
+  if (CHIRO_CACHE.has(id)) return CHIRO_CACHE.get(id);
+
+  const snap = await db.collection(CHIRO_COLL).doc(id).get();
+  const data = (snap.exists && snap.data() && snap.data().days) ? snap.data().days : {};
+  CHIRO_CACHE.set(id, data);
+  return data;
+}
+</script>
 
   
 </body>
