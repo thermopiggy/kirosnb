@@ -854,23 +854,34 @@ body.light-mode .chiro-cal-day:hover{
     const btnPrev  = document.getElementById('calPrev');
     const btnNext  = document.getElementById('calNext');
 
-    const LS_SLOTS_KEY = 'CHIRO_SLOTS_V1';
-    let daySlots = new Map();
+  // === Firestore вместо localStorage (READ-ONLY за потребител) ===
+let daySlots = new Map();  // Map<YYYY-MM-DD, {slot:boolean,...}>
 
-    function loadSlots(){
-      try{
-        const raw = localStorage.getItem(LS_SLOTS_KEY);
-        if(!raw) return;
-        const obj = JSON.parse(raw);
-        daySlots = new Map(Object.entries(obj));
-      }catch{}
-    }
-    function saveSlots(){
-      try{
-        const obj = Object.fromEntries(daySlots);
-        localStorage.setItem(LS_SLOTS_KEY, JSON.stringify(obj));
-      }catch{}
-    }
+async function loadSlotsFor(year, monthIndex){
+  const monthData = await chiroLoadMonth(year, monthIndex);
+  // попълваме daySlots за този месец
+  Object.entries(monthData).forEach(([dayKey, obj])=>{
+    // взимаме само булевите флагове за заетост по слотове
+    const slots = {
+      "09:00-11:00": !!obj["09:00-11:00"],
+      "11:00-13:00": !!obj["11:00-13:00"],
+      "13:00-15:00": !!obj["13:00-15:00"]
+    };
+    daySlots.set(dayKey, slots);
+  });
+}
+
+// no-op: потребителят не записва
+function saveSlots(){ /* read-only */ }
+
+function slotStateFor(dayKey){
+  if(!daySlots.has(dayKey)){
+    // ако в базата няма запис за деня → всичко свободно
+    daySlots.set(dayKey, {"09:00-11:00":false,"11:00-13:00":false,"13:00-15:00":false});
+  }
+  return daySlots.get(dayKey);
+}
+
 
     const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
