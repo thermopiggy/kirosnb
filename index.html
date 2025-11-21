@@ -1104,12 +1104,17 @@ if(dayLine) dayLine.textContent = label;
     monthSel.addEventListener('change', () => { viewMonth = parseInt(monthSel.value, 10); renderMonth(viewYear, viewMonth); });
     yearSel.addEventListener('change', () => { viewYear = Math.min(Math.max(parseInt(yearSel.value,10), minYear), maxYear); renderMonth(viewYear, viewMonth); });
 
-    fillYearOptions();
-    loadSlots();
-    if(now.getFullYear() < minYear){ viewYear=minYear; viewMonth=0; }
-    if(now.getFullYear() > maxYear){ viewYear=maxYear; viewMonth=11; }
-    renderMonth(viewYear, viewMonth);
-  })();
+fillYearOptions();
+
+// първоначален изглед
+if (now.getFullYear() < minYear) { viewYear = minYear; viewMonth = 0; }
+if (now.getFullYear() > maxYear) { viewYear = maxYear; viewMonth = 11; }
+
+// зареждаме данните от Firestore за стартовия месец и чак тогава рисуваме
+loadSlotsFor(viewYear, viewMonth).then(() => {
+  renderMonth(viewYear, viewMonth);
+});
+
   </script>
 
   <script>
