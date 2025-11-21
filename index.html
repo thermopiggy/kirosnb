@@ -940,6 +940,17 @@ async function loadSlotsFor(year, monthIndex){
   });
 }
 
+    function slotStateFor(dayKey){
+  if (!daySlots.has(dayKey)){
+    daySlots.set(dayKey, {
+      "09:00-11:00": false,
+      "11:00-13:00": false,
+      "13:00-15:00": false
+    });
+  }
+  return daySlots.get(dayKey);
+}
+
 
     const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
