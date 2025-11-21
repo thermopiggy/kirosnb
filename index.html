@@ -943,13 +943,7 @@ async function loadSlotsFor(year, monthIndex){
 // no-op: потребителят не записва
 function saveSlots(){ /* read-only */ }
 
-function slotStateFor(dayKey){
-  if(!daySlots.has(dayKey)){
-    // ако в базата няма запис за деня → всичко свободно
-    daySlots.set(dayKey, {"09:00-11:00":false,"11:00-13:00":false,"13:00-15:00":false});
-  }
-  return daySlots.get(dayKey);
-}
+
 
 
     const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
