@@ -762,14 +762,30 @@ body.light-mode .chiro-cal-day:hover{
 
       
 
-        <!-- Бележка за зает слот (само за админ) -->
-        <div class="chiro-cal-note-wrap" id="noteWrap" hidden>
-          <label for="slotNote" class="chiro-cal-note-label">Бележка за <span id="noteSlotLabel">слот</span>:</label>
-          <textarea id="slotNote" rows="3" placeholder="Добави бележка (напр. име, ниво, телефон)…"></textarea>
+            <!-- Бележка за зает слот (само за админ) -->
+        <div class="chiro-cal-note-wrap" id="noteWrap">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div class="chiro-cal-date">
+              <span id="ddDate">Дата</span>,
+              <span id="ddSlot">слот</span>
+            </div>
+            <button id="closeNoteBtn" class="chiro-cal-pop-x" type="button" aria-label="Затвори бележката">✕</button>
+          </div>
+
+          <label for="slotNote" class="chiro-cal-note-label">
+            Бележка за избрания слот:
+          </label>
+          <textarea id="slotNote" rows="3"
+            placeholder="Добави бележка (име, ниво, телефон…)"
+          ></textarea>
+
           <div class="note-actions">
-            <button id="saveNoteBtn" class="note-btn">Запази бележката</button>
+            <button id="saveNoteBtn" class="note-btn" type="button">
+              Запази бележката
+            </button>
           </div>
         </div>
+
 
         <div class="chiro-cal-slots">
           <button class="slot-btn" data-slot="09:00-11:00">09:00–11:00</button>
