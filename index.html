@@ -1107,10 +1107,7 @@ loadSlotsFor(viewYear, viewMonth).then(() => {
     const slotNote = document.getElementById('slotNote');
     const saveNoteBtn = document.getElementById('saveNoteBtn');
 
-    const LS_PREFIX = 'CHIRO_NOTE|';
-    const noteKey = (d, s) => `${LS_PREFIX}${d}|${s}`;
-    const saveNote = (d, s, t) => { try { localStorage.setItem(noteKey(d, s), t || ''); } catch(e) {} };
-    const loadNote = (d, s) => { try { return localStorage.getItem(noteKey(d, s)) || ''; } catch(e) { return ''; } };
+ 
 
    document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
