@@ -1065,23 +1065,7 @@ if(dayLine) dayLine.textContent = label;
 
     function closePop(){ pop.classList.remove('show'); pop.setAttribute('aria-hidden','true'); anchorDayEl = null; }
 
-    document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const dayKey = pop.dataset.date;
-        const st = slotStateFor(dayKey);
-        const slot = btn.dataset.slot;
-
-        st[slot] = !st[slot];
-        btn.classList.toggle('selected', !!st[slot]);
-
-        if(anchorDayEl){
-          const dot = anchorDayEl.querySelector('.dot');
-          dot.className = 'dot ' + dayOccupancy(dayKey);
-        }
-        daySlots.set(dayKey, st);
-        saveSlots();
-      });
-    });
+  
 
     popClose.addEventListener('click', closePop);
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePop(); });
