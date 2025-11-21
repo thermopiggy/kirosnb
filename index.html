@@ -973,12 +973,6 @@ async function loadSlotsFor(year, monthIndex){
       return cells;
     }
 
-    function slotStateFor(dayKey){
-      if(!daySlots.has(dayKey)){
-        daySlots.set(dayKey, {"09:00-11:00": false,"11:00-13:00": false,"13:00-15:00": false});
-      }
-      return daySlots.get(dayKey);
-    }
 
     function dayOccupancy(dayKey){
       const st = slotStateFor(dayKey);
