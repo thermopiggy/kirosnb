@@ -1084,74 +1084,84 @@ loadSlotsFor(viewYear, viewMonth).then(() => {
 
   </script>
 
-  <script>
-/* Бележка за зает слот (само за админ) */
-  (() => {
-    const isAdmin = () => window.chiroIsAdmin === true;
+<script>
+  // ====== FIRESTORE NOTES (ADMIN ONLY) ======
+  const noteWrap   = document.getElementById('noteWrap');
+  const closeNoteBtn = document.getElementById('closeNoteBtn');
+  const saveNoteBtn  = document.getElementById('saveNoteBtn');
 
+  const ddDate = document.getElementById('ddDate');
+  const ddSlot = document.getElementById('ddSlot');
+  const slotNote = document.getElementById('slotNote');
 
-    const pop = document.getElementById('calPop');
-    const noteWrap = document.getElementById('noteWrap');
-    const noteSlotLabel = document.getElementById('noteSlotLabel');
-    const slotNote = document.getElementById('slotNote');
-    const saveNoteBtn = document.getElementById('saveNoteBtn');
+  // Зареждане бележка от Firestore
+  async function loadNoteFromFS(dayKey, slot) {
+    try {
+      const ref = db.collection("snb_notes")
+                    .doc(`${dayKey}_${slot}`);
+      const snap = await ref.get();
+      if (snap.exists) {
+        return snap.data().text || "";
+      }
+      return "";
+    } catch (e) {
+      console.error("loadNoteFromFS error:", e);
+      return "";
+    }
+  }
 
- 
+  // Запис бележка във Firestore
+  async function saveNoteToFS(dayKey, slot, text) {
+    try {
+      await db.collection("snb_notes")
+              .doc(`${dayKey}_${slot}`)
+              .set({
+                day: dayKey,
+                slot: slot,
+                text: text,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+              });
+    } catch(e) {
+      console.error("saveNoteToFS error:", e);
+    }
+  }
 
-   document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    // ако не си логнат като админ – нищо не правим
-    if (!window.chiroIsAdmin) return;
+  // ОТВАРЯНЕ НА POPUP-а ЗА БЕЛЕЖКА
+  document.addEventListener('click', async (ev) => {
+    const btn = ev.target.closest('.slot-btn');
+    if (!btn) return;
 
-    const dayKey = pop.dataset.date;
-    const st = slotStateFor(dayKey);
+    if (!window.chiroIsAdmin) return; // само админ
+
+    const dayKey = btn.closest('#calPop').dataset.date;
     const slot = btn.dataset.slot;
 
-    st[slot] = !st[slot];
-    btn.classList.toggle('selected', !!st[slot]);
+    noteWrap.dataset.date = dayKey;
+    noteWrap.dataset.slot = slot;
 
-    if (anchorDayEl) {
-      const dot = anchorDayEl.querySelector('.dot');
-      dot.className = 'dot ' + dayOccupancy(dayKey);
-    }
+    ddDate.textContent = dayKey;
+    ddSlot.textContent = slot;
 
-    daySlots.set(dayKey, st);
+    slotNote.value = await loadNoteFromFS(dayKey, slot);
 
-    try {
-      await chiroSaveDay(dayKey, st);
-    } catch (e) {
-      console.error("Firestore write error:", e);
-    }
+    noteWrap.classList.add('show');
   });
-});
 
+  closeNoteBtn.addEventListener('click', () => {
+    noteWrap.classList.remove('show');
+  });
 
-    saveNoteBtn.addEventListener('click', () => {
-      const d = noteWrap.dataset.date;
-      const s = noteWrap.dataset.slot;
-      if (!d || !s) return;
-      saveNote(d, s, slotNote.value.trim());
-      saveNoteBtn.animate([{opacity:1},{opacity:.4},{opacity:1}],{duration:250});
-    });
-  })();
-  </script>
+  // ЗАПАЗВАНЕ ВЪВ FIRESTORE
+  saveNoteBtn.addEventListener('click', async () => {
+    const d = noteWrap.dataset.date;
+    const s = noteWrap.dataset.slot;
+    if (!d || !s) return;
 
-<script>
-const toggleBtn = document.getElementById('themeToggle');
-const icon = document.getElementById('themeIcon');
+    const txt = slotNote.value.trim();
+    await saveNoteToFS(d, s, txt);
 
-function setLightMode(on) {
-  document.body.classList.toggle('light-mode', on);
-  if (on) {
-    icon.innerHTML = '<path d="M12 4.5A7.5 7.5 0 1 0 19.5 12 7.5 7.5 0 0 0 12 4.5zM12 2v2m0 16v2m10-10h-2M4 12H2m15.5-7.5-1.5 1.5M8 18l-1.5 1.5M18 18l-1.5-1.5M8 6 6.5 4.5" stroke="currentColor" stroke-width="1.5" fill="none"/>';
-  } else {
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-  }
-}
-toggleBtn.addEventListener('click', () => {
-  setLightMode(!document.body.classList.contains('light-mode'));
-});
-setLightMode(false);
+    noteWrap.classList.remove('show');
+  });
 </script>
 
 
