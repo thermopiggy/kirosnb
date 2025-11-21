@@ -1044,9 +1044,10 @@ if(dayLine) dayLine.textContent = label;
   </script>
 
   <script>
-  /* Бележка за зает слот (само за админ) */
+/* Бележка за зает слот (само за админ) */
   (() => {
-    const isAdmin = true; // смени на false за клиентите
+    const isAdmin = () => window.chiroIsAdmin === true;
+
 
     const pop = document.getElementById('calPop');
     const noteWrap = document.getElementById('noteWrap');
@@ -1059,25 +1060,33 @@ if(dayLine) dayLine.textContent = label;
     const saveNote = (d, s, t) => { try { localStorage.setItem(noteKey(d, s), t || ''); } catch(e) {} };
     const loadNote = (d, s) => { try { return localStorage.getItem(noteKey(d, s)) || ''; } catch(e) { return ''; } };
 
-    const slotBtns = document.querySelectorAll('#calPop .slot-btn');
+   document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    // ако не си логнат като админ – нищо не правим
+    if (!window.chiroIsAdmin) return;
 
-    slotBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const dayKey = pop.dataset.date;
-        const slot = btn.dataset.slot;
-        const selected = btn.classList.contains('selected'); // след toggle от календара
+    const dayKey = pop.dataset.date;
+    const st = slotStateFor(dayKey);
+    const slot = btn.dataset.slot;
 
-        if (isAdmin && selected) {
-          noteWrap.hidden = false;
-          noteSlotLabel.textContent = slot;
-          slotNote.value = loadNote(dayKey, slot);
-          noteWrap.dataset.date = dayKey;
-          noteWrap.dataset.slot = slot;
-        } else {
-          noteWrap.hidden = true;
-        }
-      });
-    });
+    st[slot] = !st[slot];
+    btn.classList.toggle('selected', !!st[slot]);
+
+    if (anchorDayEl) {
+      const dot = anchorDayEl.querySelector('.dot');
+      dot.className = 'dot ' + dayOccupancy(dayKey);
+    }
+
+    daySlots.set(dayKey, st);
+
+    try {
+      await chiroSaveDay(dayKey, st);
+    } catch (e) {
+      console.error("Firestore write error:", e);
+    }
+  });
+});
+
 
     saveNoteBtn.addEventListener('click', () => {
       const d = noteWrap.dataset.date;
@@ -1121,6 +1130,16 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
+  // дали текущият потребител е админ
+window.chiroIsAdmin = false;
+
+auth.onAuthStateChanged(user => {
+  window.chiroIsAdmin =
+    !!(user && user.email === "ТВОЯ_АДМИН_EMAIL"); // същият имейл като в правилата
+  console.log("chiroIsAdmin:", window.chiroIsAdmin);
+});
+
+
 
 /* Колекция за сноуборд слотовете (отделно от календар_v2 на index2) */
 const CHIRO_COLL = 'snb_calendar_v1';
@@ -1131,6 +1150,28 @@ const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 
 /* Кеш на месеци в паметта */
 const CHIRO_CACHE = new Map();
+
+  // запис на един ден в Firestore (само за админ)
+async function chiroSaveDay(dayKey, st){
+  const [y, m, d] = dayKey.split("-");
+  const docId = `${y}-${m}`; // YYYY-MM
+
+  const dayData = {
+    "09:00-11:00": !!st["09:00-11:00"],
+    "11:00-13:00": !!st["11:00-13:00"],
+    "13:00-15:00": !!st["13:00-15:00"]
+  };
+
+  await db.collection(CHIRO_COLL).doc(docId).set({
+    days: { [dayKey]: dayData }
+  }, { merge: true });
+
+  // обновяваме кеша
+  const current = CHIRO_CACHE.get(docId) || {};
+  current[dayKey] = dayData;
+  CHIRO_CACHE.set(docId, current);
+}
+
 
 /* Четене на месец: doc 'YYYY-MM' -> { days: { 'YYYY-MM-DD': { "09:00-11:00": true/false, "11:00-13:00": ..., "13:00-15:00": ..., notes?: {slot: text} } } } */
 async function chiroLoadMonth(year, monthIndex){
