@@ -835,6 +835,75 @@ body.light-mode .chiro-cal-day:hover{
   </script>
 
   <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAhCskH1-lEgKftu4YuwaLTSPcjRYXByHk",
+  authDomain: "kirosnb.firebaseapp.com",
+  projectId: "kirosnb",
+  storageBucket: "kirosnb.firebasestorage.app",
+  messagingSenderId: "956591722660",
+  appId: "1:956591722660:web:1be398fd69d023518bd631"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+  // дали текущият потребител е админ
+window.chiroIsAdmin = false;
+
+auth.onAuthStateChanged(user => {
+  window.chiroIsAdmin =
+    !!(user && user.email === "ТВОЯ_АДМИН_EMAIL"); // същият имейл като в правилата
+  console.log("chiroIsAdmin:", window.chiroIsAdmin);
+});
+
+
+
+/* Колекция за сноуборд слотовете (отделно от календар_v2 на index2) */
+const CHIRO_COLL = 'snb_calendar_v1';
+
+/* Помощни */
+const pad = n => (n<10?'0':'')+n;
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+/* Кеш на месеци в паметта */
+const CHIRO_CACHE = new Map();
+
+  // запис на един ден в Firestore (само за админ)
+async function chiroSaveDay(dayKey, st){
+  const [y, m, d] = dayKey.split("-");
+  const docId = `${y}-${m}`; // YYYY-MM
+
+  const dayData = {
+    "09:00-11:00": !!st["09:00-11:00"],
+    "11:00-13:00": !!st["11:00-13:00"],
+    "13:00-15:00": !!st["13:00-15:00"]
+  };
+
+  await db.collection(CHIRO_COLL).doc(docId).set({
+    days: { [dayKey]: dayData }
+  }, { merge: true });
+
+  // обновяваме кеша
+  const current = CHIRO_CACHE.get(docId) || {};
+  current[dayKey] = dayData;
+  CHIRO_CACHE.set(docId, current);
+}
+
+
+/* Четене на месец: doc 'YYYY-MM' -> { days: { 'YYYY-MM-DD': { "09:00-11:00": true/false, "11:00-13:00": ..., "13:00-15:00": ..., notes?: {slot: text} } } } */
+async function chiroLoadMonth(year, monthIndex){
+  const id = `${year}-${pad(monthIndex+1)}`;
+  if (CHIRO_CACHE.has(id)) return CHIRO_CACHE.get(id);
+
+  const snap = await db.collection(CHIRO_COLL).doc(id).get();
+  const data = (snap.exists && snap.data() && snap.data().days) ? snap.data().days : {};
+  CHIRO_CACHE.set(id, data);
+  return data;
+}
+</script>
+
+  <script>
   /* CALENDAR v2: навигация 2025–2050, localStorage, заключени минали дни */
   (() => {
     const minYear = 2025, maxYear = 2050;
@@ -1116,74 +1185,6 @@ toggleBtn.addEventListener('click', () => {
 setLightMode(false);
 </script>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAhCskH1-lEgKftu4YuwaLTSPcjRYXByHk",
-  authDomain: "kirosnb.firebaseapp.com",
-  projectId: "kirosnb",
-  storageBucket: "kirosnb.firebasestorage.app",
-  messagingSenderId: "956591722660",
-  appId: "1:956591722660:web:1be398fd69d023518bd631"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db   = firebase.firestore();
-
-  // дали текущият потребител е админ
-window.chiroIsAdmin = false;
-
-auth.onAuthStateChanged(user => {
-  window.chiroIsAdmin =
-    !!(user && user.email === "ТВОЯ_АДМИН_EMAIL"); // същият имейл като в правилата
-  console.log("chiroIsAdmin:", window.chiroIsAdmin);
-});
-
-
-
-/* Колекция за сноуборд слотовете (отделно от календар_v2 на index2) */
-const CHIRO_COLL = 'snb_calendar_v1';
-
-/* Помощни */
-const pad = n => (n<10?'0':'')+n;
-const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-
-/* Кеш на месеци в паметта */
-const CHIRO_CACHE = new Map();
-
-  // запис на един ден в Firestore (само за админ)
-async function chiroSaveDay(dayKey, st){
-  const [y, m, d] = dayKey.split("-");
-  const docId = `${y}-${m}`; // YYYY-MM
-
-  const dayData = {
-    "09:00-11:00": !!st["09:00-11:00"],
-    "11:00-13:00": !!st["11:00-13:00"],
-    "13:00-15:00": !!st["13:00-15:00"]
-  };
-
-  await db.collection(CHIRO_COLL).doc(docId).set({
-    days: { [dayKey]: dayData }
-  }, { merge: true });
-
-  // обновяваме кеша
-  const current = CHIRO_CACHE.get(docId) || {};
-  current[dayKey] = dayData;
-  CHIRO_CACHE.set(docId, current);
-}
-
-
-/* Четене на месец: doc 'YYYY-MM' -> { days: { 'YYYY-MM-DD': { "09:00-11:00": true/false, "11:00-13:00": ..., "13:00-15:00": ..., notes?: {slot: text} } } } */
-async function chiroLoadMonth(year, monthIndex){
-  const id = `${year}-${pad(monthIndex+1)}`;
-  if (CHIRO_CACHE.has(id)) return CHIRO_CACHE.get(id);
-
-  const snap = await db.collection(CHIRO_COLL).doc(id).get();
-  const data = (snap.exists && snap.data() && snap.data().days) ? snap.data().days : {};
-  CHIRO_CACHE.set(id, data);
-  return data;
-}
-</script>
 
   
 </body>
