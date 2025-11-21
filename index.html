@@ -1108,18 +1108,19 @@ setLightMode(false);
 </script>
 
 <script>
-/* Firebase INIT – същият проект като в index2 */
 const firebaseConfig = {
-  apiKey: "AIzaSyA2bfkzHl6IoLzy9Bz9gli2kL9airHuUCw",
-  authDomain: "lhv2-48243.firebaseapp.com",
-  projectId: "lhv2-48243",
-  storageBucket: "lhv2-48243.firebasestorage.app",
-  messagingSenderId: "394167863285",
-  appId: "1:394167863285:web:362b103f23f69d8dfbc2bc"
+  apiKey: "AIzaSyAhCskH1-lEgKftu4YuwaLTSPcjRYXByHk",
+  authDomain: "kirosnb.firebaseapp.com",
+  projectId: "kirosnb",
+  storageBucket: "kirosnb.firebasestorage.app",
+  messagingSenderId: "956591722660",
+  appId: "1:956591722660:web:1be398fd69d023518bd631"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.firestore();
+
 
 /* Колекция за сноуборд слотовете (отделно от календар_v2 на index2) */
 const CHIRO_COLL = 'snb_calendar_v1';
