@@ -579,6 +579,27 @@ body.chiro-admin .chiro-cal-note-wrap{
   display: flex;          /* връщаме оригиналния flex layout */
 }
 
+    /* скрит админ бутон долу вляво */
+.admin-hidden-btn{
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  opacity: 0;
+  pointer-events: auto;
+  z-index: 1500;
+}
+
+/* само за админ става леко видим при натискане */
+body.chiro-admin .admin-hidden-btn:active{
+  opacity: 0.3;
+  background: rgba(255,255,255,0.1);
+}
+
   </style>
 </head>
 <body>
@@ -832,6 +853,7 @@ body.chiro-admin .chiro-cal-note-wrap{
   </div>
 </section>
 
+  <button id="adminPanelBtn" class="admin-hidden-btn"></button>
   
   <script>
     /* NAV + DRAWERS */
@@ -1235,6 +1257,12 @@ loadSlotsFor(viewYear, viewMonth).then(() => {
 </script>
 
 
-  
+<script>
+document.getElementById('adminPanelBtn').addEventListener('click', () => {
+  if (!window.chiroIsAdmin) return;
+  alert("Админ панел!");
+});
+</script>
+
 </body>
 </html>
