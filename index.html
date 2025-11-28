@@ -579,7 +579,7 @@ body.chiro-admin .chiro-cal-note-wrap{
   display: flex;          /* връщаме оригиналния flex layout */
 }
 
-    /* скрит админ бутон долу вляво */
+/* скрит бутон долу вляво */
 .admin-hidden-btn{
   position: fixed;
   bottom: 12px;
@@ -594,10 +594,110 @@ body.chiro-admin .chiro-cal-note-wrap{
   z-index: 1500;
 }
 
-/* само за админ става леко видим при натискане */
+/* при натискане (само ти знаеш къде е) */
 body.chiro-admin .admin-hidden-btn:active{
   opacity: 0.3;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
+}
+
+/* модал – по подразбиране скрит */
+.admin-panel{
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 1600;
+}
+
+.admin-panel.show{
+  display: block;
+}
+
+.admin-panel__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+}
+
+.admin-panel__box{
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: min(320px, 90vw);
+  background: rgba(10,12,14,0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 12px 14px;
+  color: var(--chiro-text);
+  font-size: 0.95rem;
+}
+
+body.light-mode .admin-panel__box{
+  background: #ffffff;
+  color: #111;
+}
+
+.admin-panel__header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.admin-panel__header button{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:1.1rem;
+}
+
+.admin-panel__status{
+  min-height: 18px;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  opacity: 0.8;
+}
+
+.admin-panel__form{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.admin-panel__form label{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  font-size:0.9rem;
+}
+
+.admin-panel__form input{
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.3);
+  padding:6px 8px;
+  background:rgba(0,0,0,0.25);
+  color:inherit;
+}
+
+body.light-mode .admin-panel__form input{
+  background:#f3f3f3;
+  border-color:#ccc;
+}
+
+.admin-panel__form button,
+#adminLogoutBtn{
+  margin-top:4px;
+  padding:7px 10px;
+  border-radius:9px;
+  border:1px solid rgba(255,255,255,0.3);
+  background:rgba(46,125,50,0.2);
+  color:inherit;
+  cursor:pointer;
+}
+
+#adminLogoutBtn{
+  width:100%;
+  background:rgba(198,40,40,0.2);
 }
 
   </style>
@@ -853,7 +953,45 @@ body.chiro-admin .admin-hidden-btn:active{
   </div>
 </section>
 
-  <button id="adminPanelBtn" class="admin-hidden-btn"></button>
+  <!-- Скрит бутон в долния ляв ъгъл -->
+<button id="adminPanelBtn" class="admin-hidden-btn" type="button"></button>
+
+<!-- Админ панел (модал) -->
+<div id="adminPanel" class="admin-panel" aria-hidden="true">
+  <div id="adminPanelBackdrop" class="admin-panel__backdrop"></div>
+
+  <div class="admin-panel__box" role="dialog" aria-modal="true">
+    <div class="admin-panel__header">
+      <strong>Админ панел</strong>
+      <button id="adminPanelClose" type="button">✕</button>
+    </div>
+
+    <div id="adminStatus" class="admin-panel__status"></div>
+
+    <!-- ВИЗИЯ ПРИ НЕВЛЯЗЪЛ АДМИН -->
+    <div id="adminLoginView">
+      <form id="adminLoginForm" class="admin-panel__form">
+        <label>
+          E-mail:
+          <input id="adminEmail" type="email" autocomplete="username"
+                 value="k.uzunov@hotmail.com">
+        </label>
+        <label>
+          Парола:
+          <input id="adminPass" type="password" autocomplete="current-password">
+        </label>
+        <button type="submit">Вход</button>
+      </form>
+    </div>
+
+    <!-- ВИЗИЯ ПРИ ВЛЯЗЪЛ АДМИН -->
+    <div id="adminLoggedView" style="display:none;">
+      <p>В момента си логнат като админ.</p>
+      <button id="adminLogoutBtn" type="button">Изход</button>
+    </div>
+  </div>
+</div>
+
   
   <script>
     /* NAV + DRAWERS */
@@ -1258,11 +1396,79 @@ loadSlotsFor(viewYear, viewMonth).then(() => {
 
 
 <script>
-document.getElementById('adminPanelBtn').addEventListener('click', () => {
-  if (!window.chiroIsAdmin) return;
-  alert("Админ панел!");
+const adminBtn         = document.getElementById('adminPanelBtn');
+const adminPanel       = document.getElementById('adminPanel');
+const adminBackdrop    = document.getElementById('adminPanelBackdrop');
+const adminClose       = document.getElementById('adminPanelClose');
+const adminLoginView   = document.getElementById('adminLoginView');
+const adminLoggedView  = document.getElementById('adminLoggedView');
+const adminLoginForm   = document.getElementById('adminLoginForm');
+const adminEmailInput  = document.getElementById('adminEmail');
+const adminPassInput   = document.getElementById('adminPass');
+const adminStatus      = document.getElementById('adminStatus');
+const adminLogoutBtn   = document.getElementById('adminLogoutBtn');
+
+function updateAdminView(){
+  if (window.chiroIsAdmin){
+    adminLoginView.style.display  = 'none';
+    adminLoggedView.style.display = 'block';
+    adminStatus.textContent = 'Логнат си като админ.';
+  } else {
+    adminLoginView.style.display  = 'block';
+    adminLoggedView.style.display = 'none';
+    adminStatus.textContent = '';
+  }
+}
+
+function openAdminPanel(){
+  adminPanel.classList.add('show');
+  adminPanel.setAttribute('aria-hidden','false');
+  adminEmailInput.value = 'k.uzunov@hotmail.com';
+  adminPassInput.value  = '';
+  updateAdminView();
+}
+
+function closeAdminPanel(){
+  adminPanel.classList.remove('show');
+  adminPanel.setAttribute('aria-hidden','true');
+}
+
+adminBtn.addEventListener('click', openAdminPanel);
+adminBackdrop.addEventListener('click', closeAdminPanel);
+adminClose.addEventListener('click', closeAdminPanel);
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeAdminPanel();
+});
+
+adminLoginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  adminStatus.textContent = 'Влизане...';
+
+  try{
+    const email = adminEmailInput.value.trim();
+    const pass  = adminPassInput.value;
+    await auth.signInWithEmailAndPassword(email, pass);
+    adminStatus.textContent = 'Успешен вход.';
+    updateAdminView();
+  }catch(err){
+    console.error(err);
+    adminStatus.textContent = 'Грешен e-mail или парола.';
+  }
+});
+
+adminLogoutBtn.addEventListener('click', async () => {
+  adminStatus.textContent = 'Излизане...';
+  try{
+    await auth.signOut();
+    adminStatus.textContent = 'Излезе от админ профила.';
+    updateAdminView();
+  }catch(err){
+    console.error(err);
+    adminStatus.textContent = 'Грешка при излизане.';
+  }
 });
 </script>
+
 
 </body>
 </html>
