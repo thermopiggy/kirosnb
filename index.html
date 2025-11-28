@@ -570,6 +570,15 @@ body.light-mode .chiro-cal-day:hover{
     /* Попъпът винаги с правилен цвят на текста */
 .chiro-cal-pop{ color: var(--chiro-text); }  /* #f2f5f7 */
 
+    /* Бележките в календара – видими само за админ */
+.chiro-cal-note-wrap{
+  display: none;
+}
+
+body.chiro-admin .chiro-cal-note-wrap{
+  display: flex;          /* връщаме оригиналния flex layout */
+}
+
   </style>
 </head>
 <body>
@@ -871,6 +880,9 @@ auth.onAuthStateChanged(user => {
   window.chiroIsAdmin =
     !!(user && user.email === "k.uzunov@hotmail.com"); // същият имейл като в правилата
   console.log("chiroIsAdmin:", window.chiroIsAdmin);
+  
+    // добавяме клас на body само за админа
+  document.body.classList.toggle('chiro-admin', window.chiroIsAdmin);
 });
 
 
