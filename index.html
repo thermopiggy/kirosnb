@@ -1108,6 +1108,35 @@ if (now.getFullYear() > maxYear) { viewYear = maxYear; viewMonth = 11; }
 loadSlotsFor(viewYear, viewMonth).then(() => {
   renderMonth(viewYear, viewMonth);
 });
+        // === КЛИК НА СЛОТ – МАРКИРАНЕ / ОТМАРКИРАНЕ И ЗАПИС В FIRESTORE ===
+    document.querySelectorAll('#calPop .slot-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!window.chiroIsAdmin) return;
+
+        const dayKey = pop.dataset.date;
+        if (!dayKey) return;
+
+        const st   = slotStateFor(dayKey);
+        const slot = btn.dataset.slot;
+
+        // обръщаме състоянието
+        st[slot] = !st[slot];
+        btn.classList.toggle('selected', st[slot]);
+
+        // запис в snb_calendar_v1
+        await chiroSaveDay(dayKey, st);
+
+        // обновяване на точката в календара
+        const cellDot = document.querySelector(
+          `.chiro-cal-day[data-date="${dayKey}"] .dot`
+        );
+        if (cellDot) {
+          const occ = dayOccupancy(dayKey);
+          cellDot.className = 'dot ' + occ;
+        }
+      });
+    });
+
 
     })();
 
