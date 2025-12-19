@@ -1228,13 +1228,18 @@ async function loadSlotsFor(year, monthIndex){
 
         day.appendChild(num); day.appendChild(dots);
 
-        if(!cell.out && !isPast){ day.addEventListener('click', () => openPopFor(day, dayKey)); }
+      if(!cell.out){
+  day.addEventListener('click', () => openPopFor(day, dayKey));
+}
+
         calGrid.appendChild(day);
       });
     }
 
     let anchorDayEl = null;
     function openPopFor(dayEl, dayKey){
+      if(!window.chiroIsAdmin && dayKey < ymd(new Date())) return; // без админ: никакво отваряне на минали дни
+
       anchorDayEl = dayEl;
       pop.classList.add('show'); pop.setAttribute('aria-hidden','false'); pop.dataset.date = dayKey;
       const [y,m,d] = dayKey.split('-').map(n=>parseInt(n,10));
