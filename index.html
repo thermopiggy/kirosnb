@@ -139,6 +139,9 @@
     .chiro-cal-day:hover{background:rgba(255,255,255,.06)}
     .chiro-cal-day.out{opacity:.45; filter:saturate(.7)}
     .chiro-cal-day.disabled{opacity:.35; filter:saturate(.6); pointer-events:none}
+    body.chiro-admin .chiro-cal-day.disabled{
+  pointer-events: auto; /* админът може да клика, въпреки че е замъглено */
+}
     .chiro-cal-day .num{font-weight:700; font-size:.95rem}
     .chiro-cal-day .dots{margin-top:auto; display:flex; gap:6px}
     .dot{width:8px; height:8px; border-radius:50%; opacity:.7; border:1px solid var(--chiro-border)}
